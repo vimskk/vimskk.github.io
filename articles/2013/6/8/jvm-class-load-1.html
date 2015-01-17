@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">jvm基础(4)–类加载机制（一）</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted Jun 8, 2013 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>类加载概述</h2>
+
+<p>上一篇中，我们了解了class文件的基本内容，从那里，我们知道class文件是包括一些自描述信息的一个文件，这个文件将会在jvm运行期间
+被虚拟机加载。当class文件被加载到jvm中后，最终会生成Class对象，在有了Class对象后，虚拟机便可以实例化它并在适当的时候
+调用。加载的过程可以发生在虚拟机启动时，也可以在虚拟机运行期间动态加载外部的类或者从网络传输来的类。总的来说，类的
+加载机制就是class文件被加载到jvm并生成Class对象的过程。</p>
+
+<h2>类加载的过程</h2>
+
+<p>主要分为：
+*    装载
+*    链接
+*    初始化</p>
+
+<blockquote>
+<p>###<strong>装载</strong></p>
+</blockquote>
+
+<p>类装载的过程是指从class文件中找到二进制字节码并加载到jvm中，在这过程中，jvm通过类的全限定名以及类加载器完成类的加载，
+当类被加载后，通过全限定名和类加载器实例id来标识。对于类名，也有一套规则如下：
+对于接口或者非数组型的类，其名称就是类名，这种类型的类由所在的ClassLoader负责加载。而对于数组类型，它的名称为</p>
+
+<pre class="prettyprint linenums">“[”    
+</pre>
+
+<p>加上基本类型或者是</p>
+
+<pre class="prettyprint linenums">“[”
+</pre>
+
+<p>加上引用类型类名。这一点，可以轻松的通过程序来验证：</p>
+
+<pre class="prettyprint linenums">public class LoadClassDemo {
+    public static void main(String[] args) {
+    int[] arr = new int[12];      
+    byte[] byteArr = new byte[20];
+    Object obj = new Object();
+    LoadClassDemo[] classArr = new LoadClassDemo[33];
+    System.out.println(arr.getClass());  //class \[I
+    System.out.println(byteArr.getClass());//class \[[B
+    System.out.println(obj.getClass()); //class java.lang.Object
+    System.out.println(classArr.getClass());//class \[Lcom.jvmdemo.LoadClassDemo
+    System.out.println(LoadClassDemo.class);//class com.jvmdemo.LoadClassDemo
+    }
+}
+</pre>
+
+<p>这里只取一部分，如果你有兴趣可以去探索更多的名称，不过不管怎么样，都是按照前文提到的命名规则。我们从测试中也看到
+对于类的名称或者数组中引用类型类名，其类名都是全限定名的（带有包名或者说是命名空间的）。另外，在数组型类中，元素类型
+由其所在的classLoader负责加载，而数组类则由jvm直接创建。</p>
+
+<blockquote>
+<p>###<strong>链接</strong></p>
+</blockquote>
+
+<p>经过装载过程，接下来的过程就是链接了，链接过程负责对二进制字节码的格式进行校验、初始化装载类中的静态变量，解析类中调用的
+接口、类。
+首先进行检验，字节码按照jvm规范进行校验，如果不符合则抛出VerifyError。在进行检验的过程中，如果该类引用了其它类，则也会进行
+加载，如果加载过程失败，则会抛出NoClassDefFoundError。
+完成校验步骤后，随后就jvm就会初始化类中的静态变量，并将它的值赋值为默认值。
+最后对类中的属性，方法验证。如果验证失败，则会抛出NoSuchMethodError，NoSuchFieldError等信息。</p>
+
+<blockquote>
+<p>###<strong>初始化</strong></p>
+</blockquote>
+
+<p>完成链接过程后，就开始初始化类中的静态代码块，构造器和静态属性。</p>
+
+<h2>几种类加载器</h2>
+
+<ul>
+<li>Bootstrap ClassLoader</li>
+<li>Extension ClassLoader</li>
+<li>System ClassLoader</li>
+<li>User-Defined ClassLoader</li>
+</ul>
+
+<p>其中，Bootstrap 类加载器是有JDK采用c++实现的，因此无法在java代码中获取该对象。JDK启动的时候，初始化该加载器。它主要完成加载
+JAVA_HOME中jre/lib/rt.jar中class文件。而Extension ClassLoader主要用来加载扩展功能的jar包，所以叫做扩展类加载器。它在Sun jdk中的ClassLoader
+对应的名称是ExtClassLoader。接着来看System ClassLoader，这个加载器用了加载启动参数中指定的Classpath中的jar包和目录。它在Sun jdk中
+ClassLoader对应的类名是AppClassLoader。如果你要看它的源码，建议下载openjdk查看，它位于sun.misc.Launcher命名空间下，
+因为sunjdk无法直接查看到源码，只能通过反编译手段。最后来看User-Defined ClassLoader,该加载器是用户类加载器。开发人员可以通过
+继承ClassLoader抽象了自己实现的Loader。用户自定义类加载器可以实现加载非Classpath中的类，例如可以用自定义类加载器加载网络上下载
+的类。除此之外用户自定义类加载器还可以在加载类之前对类进行解密等操作。几种类加载器就简单的介绍到这里，最后，通过一个代码小片段，来获取下
+程序中的类加载器。</p>
+
+<pre class="prettyprint linenums">public class LoadClassDemo {
+    public static void main(String[] args) {
+        System.out.println(LoadClassDemo.class.getClassLoader());//sun.misc.Launcher$AppClassLoader@19821f
+        System.out.println(LoadClassDemo.class.getClassLoader().getParent());//sun.misc.Launcher$ExtClassLoader@addbf1
+        System.out.println(LoadClassDemo.class.getClassLoader().getParent().getParent());//null
+   }
+}
+</pre>
+
+<p>我们可以看到输出，LoadClassDemo这个类的类加载器为AppClassLoader，这个应该没问题，因为我们知道，System ClassLoader加载启动参数中
+Classpath中jar包和目录，而当前我们编译运行的这个类的Classpath中就包括该类文件。这个类加载器的父类，我们看到是ExtClassLoader，也就是
+加载扩展jar包的类加载，而该加载器的父加载器却是null。因为该父加载器为Bootstrap ClassLoader，该加载器我们前面提到过，它不是java中的
+ClassLoader，因此无法获取到。</p>
+
+<h2>小结</h2>
+
+<p>本篇简单介绍了jvm加载类的基本过程和几种类加载器。下一篇将继续深入了解ClassLoader。</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2013/6/8/jvm-class-load-1.html">http://www.cocosk.com/articles/<sup>2013</sup>⁄<sub>6</sub>/8/jvm-class-load-1.html</a></li>
+<li>作者：Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2013-06-08 21:53:30</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+

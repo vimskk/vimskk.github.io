@@ -1,0 +1,1357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>RSS 订阅酷酷时空</title>
+        <link>cocosk.com</link>
+        <description>RSS 酷酷时空</description>
+        <lastBuildDate>Sat, 17 Jan 2015 20:40:05 CST</lastBuildDate>
+        <language>zh-cn</language>
+       
+        <item>
+            <title>cocos2d-x 3.0学习-Android中集成Admob插页广告</title>
+            <link>2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2014-08-17 19:00:00</pubDate>
+            <description>&lt;h2&gt;一、主要步骤&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;创建一个免费的Admob账户: (&lt;a href=&#34;http://www.google.com/ads/admob/39)[http://www.google.com/ads/admob/39&#34;&gt;http://www.google.com/ads/admob/39)[http://www.google.com/ads/admob/39&lt;/a&gt;]&lt;/li&gt;
+&lt;li&gt;创建一个新的app ID,并设置类型为插页广告的AdMob广告单元&lt;/li&gt;
+&lt;li&gt;导入Google Play services，在eclipse中选择Windows -&gt; Android SDK Manager -&gt; Extras -&gt; “Google Play services” -&gt; Install packages&lt;/li&gt;
+&lt;li&gt;修改AndroidManifest.xml文件新增如下代码：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;AndroidManifest.xml&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;meta-data android:name=&#34;com.google.android.gms.version&#34;
+               android:value=&#34;@integer/google_play_services_version&#34;/&gt;
+    &lt;activity android:name=&#34;com.google.android.gms.ads.AdActivity&#34;
+              android:configChanges=&#34;keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize&#34;/&gt;
+&lt;uses-permission android:name=&#34;android.permission.ACCESS_NETWORK_STATE&#34;/&gt;
+&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;修改AppActivity.java类如下：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;AppActivity.java&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;public class AppActivity extends Cocos2dxActivity {
+
+private static AppActivity _appActiviy;
+private static final String AD_UNIT_ID = &#34;your-ad-unit-id&#34;; //你自己广告单元的ID
+private static InterstitialAd interstitial;
+
+
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+    interstitial = new InterstitialAd(this);
+    interstitial.setAdUnitId(AD_UNIT_ID);
+    _appActiviy = this;
+    AdRequest adRequest = new AdRequest.Builder()
+    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+    .addTestDevice(&#34;HASH_DEVICE_ID&#34;)
+    .build();
+
+    interstitial.loadAd(adRequest);
+
+}
+public static void showInterstitial(){
+    _appActiviy.runOnUiThread(new Runnable() {
+
+        @Override
+        public void run() {
+             if (interstitial.isLoaded()) {
+                  interstitial.show();
+              }
+        }
+    });
+
+    }
+
+}
+&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;最后添加cpp代码，这与横幅广告一样：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;AdmobHelper.h&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#ifndef  __ADMOB_HELPER_H_
+#define  __ADMOB_HELPER_H_
+
+class AdmobHelper
+{
+public:
+    static void hideAd();
+    static void showAd();
+    static bool isAdShowing;
+
+};
+#endif // __ADMOB_HELPER_H_
+&lt;/pre&gt;
+
+&lt;p&gt;AdmobHelper.cpp&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#include &#34;AdmobHelper.h&#34;
+#include &#34;cocos2d.h&#34;
+
+bool AdmobHelper::isAdShowing = true;
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+
+#include &#34;platform/android/jni/JniHelper.h&#34;
+#include &lt;jni.h&gt;
+//#include &lt;android/log.h&gt;
+
+
+const char* AppActivityClassName = &#34;org/cocos2dx/cpp/AppActivity&#34;;
+
+void AdmobHelper::hideAd()
+{
+    cocos2d::JniMethodInfo t;
+    if (cocos2d::JniHelper::getStaticMethodInfo(t, AppActivityClassName, &#34;hideAd&#34;, &#34;()V&#34;))
+    {
+
+        t.env-&gt;CallStaticVoidMethod(t.classID, t.methodID);
+        t.env-&gt;DeleteLocalRef(t.classID);
+        isAdShowing = false;
+    }
+}
+
+
+
+void AdmobHelper::showAd()
+{
+
+    cocos2d::JniMethodInfo t;
+    if (cocos2d::JniHelper::getStaticMethodInfo(t, AppActivityClassName, &#34;showAd&#34;, &#34;()V&#34;))
+    {
+
+        t.env-&gt;CallStaticVoidMethod(t.classID, t.methodID);
+        t.env-&gt;DeleteLocalRef(t.classID);
+        isAdShowing = true;
+    }
+
+}
+
+
+#else
+
+
+void AdmobHelper::hideAd()
+{
+    CCLOG(&#34;hideAd() called&#34;);
+    isAdShowing = false;
+    return; //nothing
+}
+
+
+void AdmobHelper::showAd()
+{
+    CCLOG(&#34;showAd() called&#34;);
+    isAdShowing = true;
+    return; //nothing;
+
+}
+
+#endif
+&lt;/pre&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;简单讲述cocos2d-x-3在android中添加插页广告的步骤。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;8&lt;/sub&gt;/17/cocos2d-x-3-android-Admob-InterstitialAd.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+       
+        <item>
+            <title>cocos2d-x 3.0学习-响应android的back按键</title>
+            <link>2014/7/21/cocos2d-x-3-android-backspace-key.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2014-07-21 22:50:00</pubDate>
+            <description>&lt;h2&gt;一、响应android的back按键&lt;/h2&gt;
+
+&lt;p&gt;我们都知道，cocos2d-x可以方便的构建不同平台的应用，当我们构建基于android的应用时，有时候我们可能需要用到android的返回按键。当然这个返回按键在iPhone手机上是找不到的（目前还是如此）。既然android有这个按键，cocos2d-x当然不会对它置之不理，在cocos2d-x可以方便的通过程序来响应返回按键动作。&lt;/p&gt;
+
+&lt;h2&gt;二、简单的例子&lt;/h2&gt;
+
+&lt;p&gt;这个例子是基于cocos2d-x 3.0的，以前的版本不一样哦，所以一定要看清楚你现在用的是什么版本。在cocos2d-x 3.0中，Layer类中有一个&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;virtual void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
+&lt;/pre&gt;
+
+&lt;p&gt;这样的虚方法，我们要想响应用户的按键动作，可以在相应的Layer中重写这个函数。为了方便在不同Layer中使用，我这里写了一个BaseLayer，这样如果想要在某个定义的Layer中响应onKeyReleased事件，只需要继承BaseLayer就可以了。&lt;/p&gt;
+
+&lt;p&gt;BaseLayer.h&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#ifndef __BASE_LAYER_H__
+#define __BASE_LAYER_H__
+
+#include &#34;cocos2d.h&#34;
+
+using namespace cocos2d;
+
+class BaseLayer:public Layer{
+public:
+    virtual void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
+    bool virtual init();
+};
+
+#endif
+&lt;/pre&gt;
+
+&lt;p&gt;BaseLayer.cpp&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#include &#34;BaseLayer.h&#34;
+
+void BaseLayer::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event){
+    if(keyCode == EventKeyboard::KeyCode::KEY_BACKSPACE){
+         Director::getInstance()-&gt;popScene();
+    }else if (keyCode == EventKeyboard::KeyCode::KEY_MENU){
+
+    }
+}
+
+bool BaseLayer::init(){
+    if(!Layer::init()){
+        return false;
+    }
+    this-&gt;setKeyboardEnabled(true);
+
+    return true;
+}
+&lt;/pre&gt;
+
+&lt;p&gt;非常简单，但是还是简单解释下，注意在init函数中，我们调用了this-&gt;setKeyboardEnabled(true);这是非常重要的，否则按键将不会有响应效果。然后，我们看onKeyReleased函数中的参数，有一个是KeyCode，我们可以通过它来区分不同按键，KeyCode是一个enum&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt; enum class KeyCode
+{
+    KEY_NONE              = 0,
+    KEY_PAUSE             = 0x0013,
+    KEY_SCROLL_LOCK       = 0x1014,
+    KEY_PRINT             = 0x1061,
+    KEY_SYSREQ            = 0x106A,
+    KEY_BREAK             = 0x106B,
+    KEY_ESCAPE            = 0x001B,
+    KEY_BACKSPACE         = 0x0008,
+    KEY_TAB               = 0x000
+    ...
+ }
+&lt;/pre&gt;
+
+&lt;p&gt;这里我们需要处理KEY_BACKSPACE，所有正如上面代码所示，我们判断keyCode == EventKeyboard::KeyCode::KEY_BACKSPACE，如果是KEY_BACKSPACE，那么就处理这个按键的响应。&lt;/p&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;简单讲述了如何在cocos2d-x中响应backspace按键。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;7&lt;/sub&gt;/21/cocos2d-x-3-android-backspace-key.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+       
+        <item>
+            <title>cocos2d-x 3.0学习-创建菜单场景</title>
+            <link>2014/6/22/cocos2d-x-3-menu.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2014-06-22 10:50:00</pubDate>
+            <description>&lt;h2&gt;一、创建菜单场景&lt;/h2&gt;
+
+&lt;p&gt;我们在一个游戏中，通常打开游戏后都会有一个菜单场景，在菜单场景中你可以点击开始按钮，也可以点击其它例如设置等按钮。这是一个非常通用的场景，今天就来尝试创建一个menu的场景。&lt;/p&gt;
+
+&lt;h2&gt;二、简单的例子 - hello Menu Scene&lt;/h2&gt;
+
+&lt;p&gt;首先创建一个场景类:&lt;/p&gt;
+
+&lt;p&gt;MenuScene.h&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#ifndef __MENU_SCENE_H__
+#define __MENU_SCENE_H__
+
+
+#include &#34;cocos2d.h&#34;
+
+using namespace cocos2d;
+
+class MenuScene:public Scene{
+public:
+    MenuScene();
+    ~MenuScene();
+    virtual bool init();
+    CREATE_FUNC(MenuScene);
+
+};
+#endif
+&lt;/pre&gt;
+
+&lt;p&gt;MenuScene.cpp&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#include &#34;MenuScene.h&#34;
+#include &#34;MenuLayer.h&#34;
+#include &#34;BackgroundLayer.h&#34;
+
+MenuScene::MenuScene(){};
+MenuScene::~MenuScene(){};
+
+bool MenuScene::init(){
+    if(!Scene::init()){
+        return false;
+    }
+
+    auto bgLayer = BackgroundLayer::create();
+    if(bgLayer){
+        this-&gt;addChild(bgLayer);
+    }
+
+    auto menuLayer = MenuLayer::create();
+    if(menuLayer){
+        this-&gt;addChild(menuLayer);
+    }
+
+    return true;
+}
+&lt;/pre&gt;
+
+&lt;p&gt;可以看到在实现类中，我们在Scene中添加了两个层，一个是背景层，一个是菜单层。背景层就不说了，和创建普通层没什么区别，只是在层中添加一个背景图而已。下面看下菜单层：
+MenuLayer.h&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#ifndef __MENU_LAYER_H__
+#define __MENU_LAYER_H__
+
+#include &#34;cocos2d.h&#34;
+
+using namespace cocos2d;
+
+class MenuLayer:public Layer{
+public:
+    virtual bool init();
+    CREATE_FUNC(MenuLayer);
+    void menuStartCallback(Object *sender);
+
+};
+#endif
+&lt;/pre&gt;
+
+&lt;p&gt;MenuLayer.cpp&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#include &#34;MenuLayer.h&#34;
+#include &#34;GameScene.h&#34;
+
+bool MenuLayer::init(){
+if(!Layer::init()){
+    return false;
+}
+Point origin = Director::getInstance()-&gt;getVisibleOrigin();
+Size visiableSize = Director::getInstance()-&gt;getVisibleSize();
+SpriteFrame *playBtnFrmae = SpriteFrameCache::getInstance()-&gt;getSpriteFrameByName(&#34;play_btn.png&#34;);
+auto playBtn = Sprite::createWithSpriteFrame(playBtnFrmae);
+auto activePlayBtn = Sprite::createWithSpriteFrame(playBtnFrmae);
+activePlayBtn-&gt;setPositionY(7);
+auto menuItem  = MenuItemSprite::create(playBtn,activePlayBtn,NULL,CC_CALLBACK_1(MenuLayer::menuStartCallback, this));
+menuItem-&gt;setPosition(Point(origin.x &#43; visiableSize.width/2 ,origin.y &#43; visiableSize.height*2/5));
+
+auto menu = Menu::create(menuItem,NULL);
+menu-&gt;setPosition(Point(origin.x ,origin.y));
+this-&gt;addChild(menu,1);
+return true;
+}
+
+void MenuLayer::menuStartCallback(Object *sender){
+    log(&#34;start game...&#34;);
+    auto gameScene = GameScene::create();
+    TransitionScene *transition = TransitionFade::create(1,gameScene);
+    Director::getInstance()-&gt;replaceScene(transition);
+}
+&lt;/pre&gt;
+
+&lt;p&gt;在菜单层中的init函数中，通过MenuItemSprite::create(playBtn,activePlayBtn,NULL,CC_CALLBACK_1(MenuLayer::menuStartCallback, this));创建了一个基于精灵的菜单项，其中第一个参数是一个精灵，第二个也是，只不过对第二个进行了Y方向的偏移。这样做的目的是第一个参数是正常情况菜单项显示的精灵（可以简单认为图片），第二个是当选中菜单项时候菜单项显示的精灵，这样就形成了动态效果。第三个参数是无效时候的菜单项显示，这里不需要所以是NULL，第四个参数是一个回调函数，就是当点击菜单项时候触发的函数。于是当点击的时候，就会调用：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;void MenuLayer::menuStartCallback(Object *sender){
+    log(&#34;start game...&#34;);
+    auto gameScene = GameScene::create();
+    TransitionScene *transition = TransitionFade::create(1,gameScene);
+    Director::getInstance()-&gt;replaceScene(transition);
+}
+&lt;/pre&gt;
+
+&lt;p&gt;这里除了打印log外，创建了一个主游戏场景，并通过TransitionScene进行切换场景。还是回到上面，完成创建菜单项后，就可以创建菜单了，只要把菜单项放入菜单即可。当然这里只有一个菜单项，你可以可以尝试创建多个。最后将Menu对象放入层中，就好了。最后效果：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;/assets/themes/bs/pic/menu.png&#34;&gt;&lt;img src=&#34;/assets/themes/bs/pic/menu.png&#34; alt=&#34;&#34; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;长得有点丑，哈哈，这里只是通过一个简单的例子来展示如何创建菜单场景的，你可以尝试加入更好看的元素，创建一个更漂亮的菜单场景。当然创建菜单的过程类似。&lt;/p&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;一个小例子，展示如何在cocos2d-x中创建菜单场景。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/6/22/cocos2d-x-3-menu.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;6&lt;/sub&gt;/22/cocos2d-x-3-menu.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+       
+        <item>
+            <title>随便说说</title>
+            <link>2014/6/15/talk-today.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2014-06-15 18:53:00</pubDate>
+            <description>&lt;h2&gt;愉快的周末&lt;/h2&gt;
+
+&lt;p&gt;这个应该是本博客的第一篇非技术类文章。之前一直不想发非技术类的文章，觉得要发点有用的东西给读者看才好，不过，今天就破例一次了。因为今天是一个愉快的周末。原因是今天一口气修复了基于Go语言的静态博客引擎(&lt;a href=&#34;https://github.com/scottkiss/gosk&#34;&gt;gosk&lt;/a&gt;)的好几个bug，真是大快人心。其实这些bug遗留很久了，一直没这个动力去修复，其中一个就是如果编辑的文章里面有代码，对于代码高亮处理有些bug，对于类xml的代码（包含小尖括号的code）需要真实以代码显示的，到前台却一起和其它文章内容一样被转码了，之前方法是放在前台脚本中js来处理，虽然勉强实现了，但是有各种bug，而且速度超慢。之前一直拖着，觉得这个东西可能要花些时间才能搞定，就不想浪费时间，今天实在是忍不下去了，结果没想象中的那么花费时间。看来有时候只要下决心，一些你想像很麻烦的事情其实也没那么麻烦，一个拖了将近半年的问题，一会会解决。另外还更新了cocos2d-x的一篇小文章，顺带完成了最近在做的一个游戏的一个场景。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/6/15/talk-today.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;6&lt;/sub&gt;/15/talk-today.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+       
+        <item>
+            <title>cocos2d-x 3.0学习-使用Physicals创建物理世界</title>
+            <link>2014/6/15/cocos2d-x-3-physicals.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2014-06-15 11:50:00</pubDate>
+            <description>&lt;h2&gt;一、创建物理世界&lt;/h2&gt;
+
+&lt;p&gt;在cocos2d-x 3.0版本中，封装了方便模拟物理世界操作的一系列physicals类，在这之前一般是将box2d或者chipmunk集成到cocos2d-x中来。而现在，就方便多了，到底多简单？看看就知道。接下来就来实现一个简单的物理世界吧。&lt;/p&gt;
+
+&lt;h2&gt;二、简单的例子 - hello Physicals world&lt;/h2&gt;
+
+&lt;p&gt;首先创建一个场景:&lt;/p&gt;
+
+&lt;p&gt;PhyScene.h&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#ifndef __PHY_SCENE_H__
+#define __PHY_SCENE_H__
+
+
+#include &#34;cocos2d.h&#34;
+
+using namespace cocos2d;
+
+class PhySceneDemo:public Layer{
+public:
+    virtual bool init();
+    static Scene* scene();
+    CREATE_FUNC(PhySceneDemo);
+    void setPhyWorld(PhysicsWorld *phyworld){this-&gt;m_world=phyworld;}
+    void PhySceneDemo::onTouchesEnded(const std::vector&lt;Touch*&gt;&amp; touches, Event *event);
+
+private:
+    PhysicsWorld *m_world;
+
+};
+
+#endif
+&lt;/pre&gt;
+
+&lt;p&gt;PhyScene.cpp&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#include &#34;PhyScene.h&#34;
+
+Scene* PhySceneDemo::scene(){
+    auto scene = Scene::createWithPhysics();
+    auto layer = PhySceneDemo::create();
+    layer-&gt;setPhyWorld(scene-&gt;getPhysicsWorld());
+    scene-&gt;addChild(layer);
+    return scene;
+}
+
+bool PhySceneDemo::init(){
+
+    if(!Layer::init()){
+        return false;
+    }
+
+    Size visiableSize = Director::getInstance()-&gt;getVisibleSize();
+    Point point = Director::getInstance()-&gt;getVisibleOrigin();
+    edge = Sprite::create();
+
+    auto body = PhysicsBody::createEdgeBox(visiableSize,PHYSICSBODY_MATERIAL_DEFAULT,3);
+    edge-&gt;setPosition(Point(visiableSize.width/2,visiableSize.height/2));
+    edge-&gt;setPhysicsBody(body);
+    this-&gt;addChild(edge);
+    edge-&gt;setTag(0);
+    this-&gt;setTouchEnabled(true);
+
+    return true;
+}
+
+void PhySceneDemo::onTouchesEnded(const std::vector&lt;Touch*&gt;&amp; touches, Event *event){
+    for(Touch *touch:touches){
+        auto location = touch-&gt;getLocation();
+        Sprite *sprite = Sprite::create(&#34;hero_00.png&#34;);
+        sprite-&gt;setPosition(location);
+        sprite-&gt;setTag(1);
+        auto sbody = PhysicsBody::createBox(Size(31,32));
+        sprite-&gt;setPhysicsBody(sbody);
+
+        this-&gt;addChild(sprite);
+    }
+
+}
+&lt;/pre&gt;
+
+&lt;p&gt;最后修改AppDelegate.cpp文件，将启动Scene设置成PhySceneDemo：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;auto scene = PhySceneDemo::scene();
+// run
+director-&gt;runWithScene(scene);
+&lt;/pre&gt;
+
+&lt;p&gt;通过以上代码便完成了具有物理效果的一个物理场景，是不是非常简单，最后看下运行效果，然后我们再解释关键代码的意思。
+&lt;a href=&#34;/assets/themes/bs/pic/cocos_phy.gif&#34;&gt;&lt;img src=&#34;/assets/themes/bs/pic/cocos_phy.gif&#34; alt=&#34;&#34; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;三、关键代码讲解&lt;/h2&gt;
+
+&lt;p&gt;相信大家都看到上图的效果了，那么现在来具体讲解下前面程序中，是如何创建一个物理世界的。
+首先还是创建了一个场景叫做PhyScene.h的头文件，其中大部分与普通场景的创建类似，比如自带的HelloWorld场景。只不过新增了一个PhysicsWorld *m_world 的私有成员变量和一个void setPhyWorld(PhysicsWorld *phyworld){this-&gt;m_world=phyworld;}成员函数。由于PhySceneDemo类其实是一个继承Layer的类，本身是没有PhysicsWorld的，PhysicsWorld是在Scene类中的，上面新增的这两个就是将Scene的PhysicsWorld传递到Layer中，是得Layer具有物理世界的性质。具体传递可以看PhyScene.cpp的scene成员函数的实现，里面有&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;layer-&gt;setPhyWorld(scene-&gt;getPhysicsWorld());
+&lt;/pre&gt;
+
+&lt;p&gt;这样，Layer中就有了PhysicsWorld，然后可以让添加到Layer中的Sprite等节点具有物理特效。具体来看init实现中的：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;edge = Sprite::create();
+auto body = PhysicsBody::createEdgeBox(visiableSize,PHYSICSBODY_MATERIAL_DEFAULT,3);
+edge-&gt;setPosition(Point(visiableSize.width/2,visiableSize.height/2));
+edge-&gt;setPhysicsBody(body);
+this-&gt;addChild(edge);
+&lt;/pre&gt;
+
+&lt;p&gt;关键创建一个PhysicsBody对象，但是我们看到这里是用createEdgeBox创建的。而后面的onTouchesEnded函数中的又是使用createBox函数创建的，其实还有更多的创建方式。虽然都是返回PhysicsBody对象，但是效果不一样。举例说明前者，我们进入createEdgeBox函数实现可以看到：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt; PhysicsBody* body = new PhysicsBody();
+ if (body &amp;&amp; body-&gt;init())
+ {
+    body-&gt;addShape(PhysicsShapeEdgeBox::create(size, material, border, offset));
+    body-&gt;_dynamic = false;
+    body-&gt;autorelease();
+    return body;
+ }
+&lt;/pre&gt;
+
+&lt;p&gt;其实在创建PhysicsBody对象的同时，会给他赋予Shape属性和其它一些属性，这里是一个PhysicsShapeEdgeBox，从名称可以看到是一个边缘盒子模型(物理世界的边缘)。最后设置精灵对象的PhysicsBody属性为之前的body对象，这样这个精灵就成为了一个物理世界的精灵。&lt;/p&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;简单介绍了如何使用texturepacker并在cocos2d-x中创建精灵动画。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/6/15/cocos2d-x-3-physicals.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;6&lt;/sub&gt;/15/cocos2d-x-3-physicals.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+       
+        <item>
+            <title>java servlet简单实现http服务器推</title>
+            <link>2014/5/29/http-server-push.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2014-05-29 15:52:00</pubDate>
+            <description>&lt;h2&gt;前言&lt;/h2&gt;
+
+&lt;p&gt;这几天有个小伙伴要实现http协议的服务器推的业务,于是就简单实现了下，且利用客户端模拟持续发送请求，模拟双向通信，当然只是一种简单的模型，如要应用于实际请慎重！&lt;/p&gt;
+
+&lt;p&gt;客户端代码:&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;package com.test.client;
+
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class HttpLongConnectionClient {
+public static void main(String[] args) {
+    try {
+
+         URL url = new URL(&#34;http://localhost:8080/TestWeb/test.do&#34;);  
+          ReqRunnable rr = new ReqRunnable(url);
+            Thread reqThread = new Thread(rr);
+            reqThread.start();
+
+            InputStream in=url.openStream();  
+            int n = -1;  
+            byte[] b = new byte[1024];
+
+            while((n=in.read(b))!=-1)  
+            {  
+                String s=new String(b,0,n);  
+                System.out.println(s);      
+            }  
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+static class ReqRunnable implements Runnable{
+    URL url;
+    ReqRunnable(URL url){
+        this.url = url;
+    }
+    @Override
+    public void run() {
+        try {
+            int count=0;
+            while(true){
+                //模拟新事件产生
+                HttpURLConnection conn = (HttpURLConnection) this.url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod(&#34;POST&#34;);
+                conn.setRequestProperty(&#34;content-type&#34;, &#34;application/x-www-form-urlencoded&#34;);
+                conn.setUseCaches(false);
+                OutputStreamWriter out = new  OutputStreamWriter (conn.getOutputStream());
+                String test = &#34;data=yes&#34;&#43;count&#43;&#43;;
+                out.write(test);
+                System.out.println(&#34;===&gt;&#34;&#43;test);
+                out.flush();                                         
+                out.close();
+                InputStream inputStream = conn.getInputStream();  
+                Thread.sleep(3000);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+}    
+&lt;/pre&gt;
+
+&lt;p&gt;服务器端代码:&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;public class TestServlet extends HttpServlet {
+private static final long serialVersionUID = 1L;
+
+
+    public TestServlet() {
+        super();
+    }
+
+
+protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    try{
+        PrintWriter out = response.getWriter();
+        int count = 0;
+        while(true){
+            System.out.println(&#34;read from client&#34;&#43;request.getParameter(&#34;data&#34;));
+            out.println(&#34;hello&#34;&#43;count);
+            out.flush();
+            Thread.sleep(1000);
+            count&#43;&#43;;
+        }
+    }catch(Exception e){
+        e.printStackTrace();
+    }
+
+}
+
+}
+&lt;/pre&gt;
+
+&lt;h2&gt;小结&lt;/h2&gt;
+
+&lt;p&gt;简单实现http协议服务器推，感觉写得好恶心，纯属娱乐~ 后续研究更好的方案。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/5/29/http-server-push.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;5&lt;/sub&gt;/29/http-server-push.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+       
+        <item>
+            <title>cocos2d-x学习-使用TexturePacker打包图片并创建精灵动画</title>
+            <link>2014/5/25/texturepacker-use.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2014-05-25 18:27:00</pubDate>
+            <description>&lt;h2&gt;一、关于TexturePacker&lt;/h2&gt;
+
+&lt;p&gt;TexturePacker是一个游戏图片打包工具，通过它，我们可以方便的将多个帧图片合成一张大图，来提高性能，对于这点在手机平台的游戏显得尤为重要。更多的资料可以参考官网:&lt;a href=&#34;http://www.codeandweb.com/texturepacker/&#34;&gt;http://www.codeandweb.com/texturepacker&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;二、简单的例子&lt;/h2&gt;
+
+&lt;p&gt;首先我们找来三张小图，连起来就代表一个游戏人物的的行走动画：
+&lt;a href=&#34;/assets/themes/bs/pic/texturepacker_a.bmp&#34;&gt;&lt;img src=&#34;/assets/themes/bs/pic/texturepacker_a.bmp&#34; alt=&#34;&#34; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;然后打开，TexturePacker工具将它们依次拖入工具右侧的资源窗口，如下图：
+&lt;a href=&#34;/assets/themes/bs/pic/texturepacker_b.bmp&#34;&gt;&lt;img src=&#34;/assets/themes/bs/pic/texturepacker_b.bmp&#34; alt=&#34;&#34; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;然后在左侧的Data Format选择cocos2d,Data File选择一个路径保存文件，最后点击publish。这样在你之前选择的保存文件的路径下，可以找到两个文件，一个是合成的大图文件，一个是plist文件。在这里是hero.png和hero.plist&lt;/p&gt;
+
+&lt;h2&gt;三、创建精灵动画&lt;/h2&gt;
+
+&lt;p&gt;首先创建一个cocos2d-x的cpp工程，然后将上一步骤得到的两个文件都放入Resources目录下。然后创建一个场景：&lt;/p&gt;
+
+&lt;p&gt;HeroScene.h&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#pragma once
+
+#include &#34;cocos2d.h&#34;
+
+using namespace cocos2d;
+
+class HeroScene :public Layer{
+public:
+    static Scene* scene();
+    virtual bool init();
+    CREATE_FUNC(HeroScene);
+};
+&lt;/pre&gt;
+
+&lt;p&gt;HeroScene.cpp&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#include &#34;HeroScene.h&#34;
+
+Scene* HeroScene::scene(){
+    auto scene = Scene::create();
+    auto layer = HeroScene::create();
+    scene-&gt;addChild(layer);
+    return scene;
+
+}
+
+bool HeroScene::init(){
+    if(!Layer::init()){
+        return false;
+    }
+
+SpriteFrameCache* frameCache = SpriteFrameCache::getInstance();
+
+frameCache-&gt;addSpriteFramesWithFile(&#34;hero.plist&#34;,&#34;hero.png&#34;);
+
+Vector&lt;SpriteFrame*&gt; frameArray = Vector&lt;SpriteFrame*&gt;(3);
+
+SpriteFrame* sfa = frameCache-&gt;getSpriteFrameByName(&#34;a.gif&#34;);
+SpriteFrame* sfb = frameCache-&gt;getSpriteFrameByName(&#34;b.gif&#34;);
+SpriteFrame* sfc = frameCache-&gt;getSpriteFrameByName(&#34;c.gif&#34;);
+
+frameArray.pushBack(sfa);
+frameArray.pushBack(sfb);
+frameArray.pushBack(sfc);
+
+Animation* animation = Animation::createWithSpriteFrames(frameArray);
+animation-&gt;setDelayPerUnit(0.1f);
+animation-&gt;setLoops(-1);
+Animate* animate = Animate::create(animation);
+
+Sprite* hero = Sprite::createWithSpriteFrameName(&#34;a.gif&#34;);
+hero-&gt;setPosition(ccp(100,200));
+hero-&gt;runAction(animate);
+
+this-&gt;addChild(hero);
+return true;
+
+}
+&lt;/pre&gt;
+
+&lt;p&gt;最后，主要是看这一句&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;frameCache-&gt;addSpriteFramesWithFile(&#34;hero.plist&#34;,&#34;hero.png&#34;);
+&lt;/pre&gt;
+
+&lt;p&gt;这里就是之前通过TexturePacker打包的图片和数据文件，通过SpriteFrameCache类可以方便的加载它们到帧缓存中，并在后续方便的使用。最后运行看下效果：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;/assets/themes/bs/pic/texturepacker_c.bmp&#34;&gt;&lt;img src=&#34;/assets/themes/bs/pic/texturepacker_c.bmp&#34; alt=&#34;&#34; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;简单介绍了如何使用texturepacker并在cocos2d-x中创建精灵动画。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/5/25/texturepacker-use.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;5&lt;/sub&gt;/25/texturepacker-use.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+       
+        <item>
+            <title>spring新手攻略（13）- spring注解(annotation)配置</title>
+            <link>2014/4/26/spring-annotation-configuration.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2014-04-26 11:52:00</pubDate>
+            <description>&lt;h2&gt;前言&lt;/h2&gt;
+
+&lt;p&gt;在&lt;a href=&#34;http://cocosk.com/articles/2014/4/13/spring-autowire.html&#34;&gt;上一篇&lt;/a&gt;中，我们介绍了spring自动装配(autowire)的特性。而从系列一开始，我们似乎就一直在xml配置文件中捣鼓，包括上篇的自动装配。不过，自从spring2.5开始，spring还支持了基于注解(annotation)的配置方式。那么这篇我们就来介绍下这个特性，看看它能给我们带来多大的惊喜。&lt;/p&gt;
+
+&lt;h2&gt;基于annotation的配置&lt;/h2&gt;
+
+&lt;p&gt;在默认情况下，spring的annotation是没有开启的，为了支持这一特性，我们需要修改下配置文件如下：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
+xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+xmlns:context=&#34;http://www.springframework.org/schema/context&#34;
+xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd&#34;&gt;
+    &lt;context:annotation-config&gt;&lt;/context:annotation-config&gt;
+&lt;/beans&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;只要加入&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;context:annotation-config&gt;&lt;/context:annotation-config&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;上面这个配置，你就可以通过注解(annotation)的方式来完成上一篇中同样自动装配bean的功能。这个如何做？暂且保密，等等哦，往下看会有的。&lt;/p&gt;
+
+&lt;h2&gt;几个常用的annotation&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;@Required 这个注解应用于bean的setter方法。&lt;/li&gt;
+&lt;li&gt;@Autowired 这个注解应用于bean的属性setter方法，构造方法，属性等。&lt;/li&gt;
+&lt;li&gt;@Qualifier 这个注解一般会和@Autowired一起出现，当有多个bean具有相同类型的时候，你可以通过这个注解来明确指定是哪个bean。&lt;/li&gt;
+&lt;li&gt;JSR-250 Annotations spring还支持@Resource,@PostConstruct和@PreDestroy annotations等基于JSR-250的annotation。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;还挺多，新手会不会晕了，不过别担心，今天我们之挑一个和上篇有关的，剩下的下次介绍，这样做原因一是为了保持和上篇的连贯性，二是不要让新手一次接受太多东西，三呢是作者偷懒，今天不想写那么多了。。&lt;/p&gt;
+
+&lt;h2&gt;@Autowired 注解&lt;/h2&gt;
+
+&lt;p&gt;没错，今天就是它了，从名称可以看出它也是自动装配嘛，比上篇的基于xml的自动装配形象多了，当时才没有告诉我们呢，只是说了个byName什么的。什么？你记得了？那赶紧回去看上一篇吧。好了，那我们继续还是以上篇的例子。首先，我们将Beans.xml改成下面那样:&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
+xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+xmlns:context=&#34;http://www.springframework.org/schema/context&#34;
+xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd&#34;&gt;
+
+    &lt;context:annotation-config&gt;&lt;/context:annotation-config&gt;
+
+    &lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34;&gt;&lt;/bean&gt; 
+    &lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt;
+&lt;/beans&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;然后再修改TV.java：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;package sirk_spring_tuto.demo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class TV {
+
+/**
+ * 这里给属性增加自动装配注解
+ */
+@Autowired
+private Screen screen;
+
+
+
+public void powerOn(){
+    this.screen.show();
+}
+
+public Screen getScreen() {
+    return screen;
+}
+
+public void setScreen(Screen screen) {
+    this.screen = screen;
+}
+}
+&lt;/pre&gt;
+
+&lt;p&gt;最后其他文件都不变，最后运行：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;package sirk_spring_tuto.demo;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class App {
+
+public static void main(String[] args) {
+    ApplicationContext ctx = new ClassPathXmlApplicationContext(&#34;Beans.xml&#34;);
+    TV tv = (TV) ctx.getBean(&#34;tv&#34;);
+    tv.powerOn();
+
+}
+
+}
+&lt;/pre&gt;
+
+&lt;p&gt;如果没有什么错误，结果将会和上一篇一样。但是竟然出错了：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;Caused by: java.lang.NoClassDefFoundError: org/springframework/core/type/AnnotatedTypeMetadata
+&lt;/pre&gt;
+
+&lt;p&gt;看到如此异常，不必惊慌，没找到类，一定是忘记导入什么包了，原来在xml配置中新加入的context定义需要用到spring-context包，于是加入。最终终于运行成功啦。如果你还没成功，一定是什么地方写错了，认真检查哦。&lt;/p&gt;
+
+&lt;p&gt;如果已经成功，接着我们来尝试把注解用到setter方法上：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;public class TV {
+
+
+private Screen screen;
+
+
+
+public void powerOn(){
+    this.screen.show();
+}
+
+public Screen getScreen() {
+    return screen;
+}
+
+/**
+ * 这里给属性增加自动装配注解
+ */
+@Autowired
+public void setScreen(Screen screen) {
+    this.screen = screen;
+}
+}
+&lt;/pre&gt;
+
+&lt;p&gt;一样可以哦，再来试下构造方法:&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;public class TV {
+
+private Screen screen;
+
+
+/**
+ * 这里给属性增加自动装配注解
+ */
+@Autowired
+public TV(Screen sc){
+    this.screen = sc;
+}
+
+
+public void powerOn(){
+    this.screen.show();
+}
+
+public Screen getScreen() {
+    return screen;
+}
+
+
+public void setScreen(Screen screen) {
+    this.screen = screen;
+}
+}
+&lt;/pre&gt;
+
+&lt;p&gt;是不是很简单？除了这几种用法，它还有另一种用法:&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;package sirk_spring_tuto.demo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+
+
+public class TV {
+
+
+private Screen screen;
+private RemoteControl rc;
+
+
+/**
+ * 这里给属性增加自动装配注解
+ */
+@Autowired
+public TV(Screen sc){
+    this.screen = sc;
+}
+
+
+public void powerOn(){
+    this.screen.show();
+}
+
+public Screen getScreen() {
+    return screen;
+}
+
+
+public void setScreen(Screen screen) {
+    this.screen = screen;
+}
+
+public RemoteControl getRc() {
+    return rc;
+}
+
+@Autowired(required = false)
+public void setRc(RemoteControl rc) {
+    this.rc = rc;
+}
+
+}
+&lt;/pre&gt;
+
+&lt;p&gt;这里我们给电视机类新增了遥控属性，并且我们没有修改xml配置文件，也就是说，我们没有在配置文件中配置遥控类的bean，但是在setRc方法上面我们写的是：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;@Autowired(required = false)
+&lt;/pre&gt;
+
+&lt;p&gt;这样，尽管没有着要装配的bean，但是因为required是false，所以也没有报错，如果你去掉required=false，只留下@Autowired那就不一样了。这种用法实际不多，就不详细展开了。&lt;/p&gt;
+
+&lt;h2&gt;小结&lt;/h2&gt;
+
+&lt;p&gt;今天介绍了spring的基于annotation的配置，并以上篇为例子，使用@Autowired注解实现了下，并简要介绍了spring的几种主要注解，下文将介绍剩下的几种注解。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/4/26/spring-annotation-configuration.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;4&lt;/sub&gt;/26/spring-annotation-configuration.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+       
+        <item>
+            <title>spring新手攻略（12）-自动装配(Autowire)</title>
+            <link>2014/4/13/spring-autowire.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2014-04-13 11:52:00</pubDate>
+            <description>&lt;h2&gt;前言&lt;/h2&gt;
+
+&lt;p&gt;今天，主要介绍下spring的自动装配特性。看了之前的文章，我们已经看到依赖注入的强大之处，但是你会发现当一个bean依赖另一个bean的时候，你需要在xml配置文件中定义如下的元素引用：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34;&gt;
+&lt;property name=&#34;screen&#34; ref=&#34;screen&#34;&gt;&lt;/property&gt; 
+&lt;/bean&gt;
+&lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;上述代码中，id为tv的bean注入了id为screen的bean，而且是通过setter注入的，所以必须在id为tv的bean中添加&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;property name=&#34;screen&#34; ref=&#34;screen&#34;&gt;&lt;/property&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;如果还有其他的属性需要注入，也是需要依次添加上述的标签定义的。试想一下，如果你有很多bean，并且很多需要注入的依赖属性，那么你的xml配置文件将会变得非常庞大。为了解决这个问题，spring提供了一个自动装配的特性，它可以自动搜集bean，并且将依赖自动装配装配到需要的bean中去。&lt;/p&gt;
+
+&lt;h2&gt;spring自动装配的几种类型&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;byName 通过属性名称进行自动装配。spring容器通过查找在xml配置文件中autowire属性被设置为byName的bean。然后它会去试着匹配配置文件中其它bean,如果那个bean名称和需要注入的属性名称一样，就进行装配。&lt;/li&gt;
+&lt;li&gt;byType 通过属性数据类型进行自动装配。与上述byName类似，不过进行匹配的时候是根据数据类型进行匹配。&lt;/li&gt;
+&lt;li&gt;constructor 和byType类似，不过类型是根据构造方法的类型进行匹配。&lt;/li&gt;
+&lt;li&gt;autodetect 首先尝试通过构造方法进行装配，如果不成功，则通过byType进行自动装配。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;一个根据byName自动装配的例子&lt;/h2&gt;
+
+&lt;p&gt;这里我们引用&lt;a href=&#34;http://cocosk.com/articles/2014/4/4/spring-dependency-injection-2.html&#34;&gt;spring新手攻略（9）-依赖注入(二)(Dependency Injection)&lt;/a&gt;的例子，java代码部分不变。只修改xml配置文件。&lt;/p&gt;
+
+&lt;p&gt;之前的xml配置文件：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34;&gt;
+&lt;property name=&#34;screen&#34; ref=&#34;screen&#34;&gt;&lt;/property&gt; 
+&lt;/bean&gt;
+&lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;通过byName自动装配:&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34; autowire=&#34;byName&#34;&gt;
+&lt;!-- &lt;property name=&#34;screen&#34; ref=&#34;screen&#34;&gt;&lt;/property&gt;  --&gt;
+&lt;/bean&gt;
+&lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;上面我们注释掉了property的定义，但是可以正常执行。&lt;/p&gt;
+
+&lt;h2&gt;根据byType和constructor进行自动装配&lt;/h2&gt;
+
+&lt;p&gt;byType类似。只需要将autowire属性的值换成byType。constructor,只需要将autowire属性的值换成constructor。并且在id为tv的Class类TV中需要定义一个构造方法来进行通过构造方法注入。&lt;/p&gt;
+
+&lt;h2&gt;几个关于自动装配需要注意的地方&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;声明了自动装配属性后，还是可以显示的通过property等进行设置进行装配，并且这些设置会覆盖自动装配。&lt;/li&gt;
+&lt;li&gt;无法自动装配原始数据类型，Strings和Classes类型。&lt;/li&gt;
+&lt;li&gt;自动装配与手动装配相比不够精确，所以在允许情况下尽可能使用手动装配。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;小结&lt;/h2&gt;
+
+&lt;p&gt;介绍了spring中的几种自动装配方式，下文将介绍基于注解的配置。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/4/13/spring-autowire.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;4&lt;/sub&gt;/13/spring-autowire.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+       
+        <item>
+            <title>spring新手攻略（11）-注入集合</title>
+            <link>2014/4/7/spring-injecting-collection.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2014-04-07 23:52:00</pubDate>
+            <description>&lt;h2&gt;前言&lt;/h2&gt;
+
+&lt;p&gt;这几天放假，昨天把网站主题稍微改了下，所以没继续更新，今天趁热打铁，继续spring新手攻略系列。有时候真的是需要长期坚持，虽然文章不长，也没什么复杂的东西，但是坚持完成却似乎很难。因为每次都会把某系列文章更新到一半就没了，所以这次决定下狠心一定要写完了，所以，今天我们继续，今天主要讲下spring注入中对于集合类（Collection）的注入。如果你看了本系列的前几篇文章，对于今天的内容，其实是非常熟悉的，其实说到底还是注入的概念，只是注入的东西不一样了，而且你会发现使用spring其实只要遵循它规定的那种模式，其实使用起来非常方便，当然这里只是指对于初级玩家使用。为什么这么说，因为spring用起来非常简单，但是本身框架的设计确有很多可以学习鉴戒之处，对于这部分，希望今后能有机会写写。好吧，那么今天就正式进入主题：&lt;/p&gt;
+
+&lt;h2&gt;几种注入的集合配置元素&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;《list》使用该配置元素，可以注入一个list，这个list可以包含重复元素值&lt;/li&gt;
+&lt;li&gt;《set》使用该配置元素，可以注入一个set集合，不能包含重复元素&lt;/li&gt;
+&lt;li&gt;《map》使用该配置元素，就是注入一个map类型，包含任意类型的键值对元素。&lt;/li&gt;
+&lt;li&gt;《props》使用该配置元素，注入一个集合，里面是string类型的键值对元素。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;上述几种配置元素，你应该你能猜到，它们就是bean的xml配置文件中的元素，你可以使用&lt;list&gt;或者&lt;set&gt;来放任何 java.util.Collection 的实现类或者数组（array）。另外对于放入集合的元素可以是基本类型或者是另一个bean的引用。下面来看一个综合示例：&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;package sirk_spring_tuto.demo;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+public class CollectionsDemo {
+private List&lt;String&gt; nameList;
+private Set&lt;String&gt; nameSet;
+private Map&lt;String, String&gt; nameMap;
+private Properties nameProp;
+
+public List&lt;String&gt; getNameList() {
+    return nameList;
+}
+public void setNameList(List&lt;String&gt; nameList) {
+    this.nameList = nameList;
+}
+public Set&lt;String&gt; getNameSet() {
+    return nameSet;
+}
+public void setNameSet(Set&lt;String&gt; nameSet) {
+    this.nameSet = nameSet;
+}
+public Map&lt;String, String&gt; getNameMap() {
+    return nameMap;
+}
+public void setNameMap(Map&lt;String, String&gt; nameMap) {
+    this.nameMap = nameMap;
+}
+public Properties getNameProp() {
+    return nameProp;
+}
+public void setNameProp(Properties nameProp) {
+    this.nameProp = nameProp;
+}
+
+
+}
+
+
+package sirk_spring_tuto.demo;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class CollectionsMain {
+
+public static void main(String[] args) {
+    ApplicationContext ctx = new ClassPathXmlApplicationContext(&#34;CollectionBeans.xml&#34;);
+    CollectionsDemo collectionsDemo = (CollectionsDemo) ctx.getBean(&#34;collectionsDemo&#34;);
+    System.out.println(collectionsDemo.getNameList());
+    System.out.println(collectionsDemo.getNameSet());
+    System.out.println(collectionsDemo.getNameMap());
+    System.out.println(collectionsDemo.getNameProp());
+
+}
+
+}
+
+
+&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
+xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd&#34;&gt;
+
+&lt;bean id=&#34;collectionsDemo&#34; class=&#34;sirk_spring_tuto.demo.CollectionsDemo&#34;&gt;
+    &lt;property name=&#34;nameList&#34;&gt;
+        &lt;list&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+            &lt;value&gt;sirk&lt;/value&gt;
+            &lt;value&gt;hello&lt;/value&gt;                
+        &lt;/list&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameSet&#34;&gt;
+        &lt;set&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+            &lt;value&gt;sirk&lt;/value&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+        &lt;/set&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameMap&#34;&gt;
+        &lt;map&gt;
+            &lt;entry key=&#34;hello&#34; value=&#34;sirk&#34;/&gt;
+            &lt;entry key=&#34;good&#34; value=&#34;day&#34;/&gt;
+        &lt;/map&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameProp&#34;&gt;
+        &lt;props&gt;
+            &lt;prop key=&#34;one&#34;&gt;hello&lt;/prop&gt;
+            &lt;prop key=&#34;two&#34;&gt;world&lt;/prop&gt;
+        &lt;/props&gt;
+    &lt;/property&gt;
+
+&lt;/bean&gt;
+
+&lt;/beans&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;最后执行打印如下结果：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;[hello, sirk, hello]
+[hello, sirk]
+{hello=sirk, good=day}
+{two=world, one=hello}
+&lt;/pre&gt;
+
+&lt;h2&gt;注入Bean的引用&lt;/h2&gt;
+
+&lt;p&gt;前一个例子中放入集合中的元素都是值元素，如果要放入其它bean的引用，可以配置配置文件如下：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
+xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd&#34;&gt;
+
+&lt;bean id=&#34;collectionsDemo&#34; class=&#34;sirk_spring_tuto.demo.CollectionsDemo&#34;&gt;
+    &lt;property name=&#34;nameList&#34;&gt;
+        &lt;list&gt;
+            &lt;ref bean=&#34;XXX&#34;/&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+            &lt;value&gt;sirk&lt;/value&gt;
+            &lt;value&gt;hello&lt;/value&gt;                
+        &lt;/list&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameSet&#34;&gt;
+        &lt;set&gt;
+            &lt;ref bean=&#34;XXX&#34;/&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+            &lt;value&gt;sirk&lt;/value&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+        &lt;/set&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameMap&#34;&gt;
+        &lt;map&gt;
+            &lt;entry key=&#34;hello&#34; value=&#34;sirk&#34;/&gt;
+            &lt;entry key=&#34;good&#34; value=&#34;day&#34;/&gt;
+            &lt;entry key=&#34;YYY&#34; value-ref=&#34;XXX&#34;&gt;&lt;/entry&gt;
+        &lt;/map&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameProp&#34;&gt;
+        &lt;props&gt;
+            &lt;prop key=&#34;one&#34;&gt;hello&lt;/prop&gt;
+            &lt;prop key=&#34;two&#34;&gt;world&lt;/prop&gt;
+        &lt;/props&gt;
+    &lt;/property&gt;
+
+&lt;/bean&gt;
+
+&lt;/beans&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;这配置其实混合使用了值类型和引用类型，请注意那些带有ref的标签元素。就是对于引用类型的用法。&lt;/p&gt;
+
+&lt;h2&gt;注入null和空字符串&lt;/h2&gt;
+
+&lt;p&gt;最后再来看看如何注入null和空字符串：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;如果想注入null，请看下面配置&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;bean id=&#34;...&#34; class=&#34;exampleBean&#34;&gt;
+    &lt;property name=&#34;telephone&#34;&gt;&lt;null/&gt;&lt;/property&gt;
+&lt;/bean&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;这好比调用了exampleBean.setTelephone(null)&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;如果想注入空字符串，看下面配置：&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;bean id=&#34;...&#34; class=&#34;exampleBean&#34;&gt;
+     &lt;property name=&#34;telephone&#34; value=&#34;&#34;/&gt;
+&lt;/bean&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;该配置好比调用了exmapleBean.setTelephone(“”)&lt;/p&gt;
+
+&lt;h2&gt;小结&lt;/h2&gt;
+
+&lt;p&gt;本文介绍了spring对于集合的注入，下篇更精彩，敬请期待~&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/4/7/spring-injecting-collection.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;4&lt;/sub&gt;/7/spring-injecting-collection.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+       
+    </channel>
+</rss>

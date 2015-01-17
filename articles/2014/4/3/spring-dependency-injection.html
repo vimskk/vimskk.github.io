@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">spring新手攻略（8）-依赖注入(Dependency Injection)</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted Apr 3, 2014 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>前言</h2>
+
+<p>由于种种原因，spring新手攻略已经中断好久了，最近打算重新把这个坑填完，不管如何，要有始有终嘛。好了，本篇主要来讲讲spring中大名鼎鼎的依赖注入（Dependency Injection）。</p>
+
+<h2>引入</h2>
+
+<p>在讲依赖注入之前，我们先来聊聊面向对象。在面向对象中，最常用到的两种技术是继承和组合，而在大多数情况下，似乎组合方式更好，至于为什么，可以查阅相关资料。说到组合，无非就是把一个类作为另一个类的属性。这确实非常强大，因为当一个类包含另一个类时，也就拥有了另一个类的功能。但是，在享受好处的同时也带来了不好的东西，一个明显的原因就是两个类之前耦合度增加了。这违背了软件工程中高内聚低耦合的原则。于是乎，spring框架看到了这点，并很好的解决了它。说到这里，读者可能疑惑，耦合度增加了又怎么样？有什么关系嘛!如果是写点小程序确实没关系，而且挺好的。但是当进行大规模的工程时候就能体会到它的重要性了。比如当你要对一个类进行单元测试的时候，如果对于另一个类依赖太大，那将会变得非常麻烦。为什么这么说呢？因为假设类A依赖的另一个类B在实例化的时候需要做一堆动作，比如要从数据库获取数据等。而你测试的时候，不想这么麻烦，因为你只想测试类A，至于它的一个属性类B则不关心。这时候，就轮到依赖注入登场了。还是从一个例子开始把：</p>
+
+<h2>小示例</h2>
+
+<p>假设你的应用程序中有一个文本编辑组件，你想给它提供一个拼写检查的功能。对于这样的一个需求，你可能会写下面的代码：</p>
+
+<pre class="prettyprint linenums">public class TextEditor {
+   private SpellChecker spellChecker;
+   public TextEditor() {
+   spellChecker = new SpellChecker();
+  }
+}
+</pre>
+
+<p>上面的代码片段，其实TextEditor就对Spellchecker产生了依赖，因为它必须实现一个Spellchecker类型的对象。现在我们要把Spellchecker的控制权交出来，于是有了下面的代码：</p>
+
+<pre class="prettyprint linenums">public class TextEditor {
+   private SpellChecker spellChecker;
+   public TextEditor(SpellChecker spellChecker) {
+   this.spellChecker = spellChecker;
+   }
+}
+</pre>
+
+<p>思路其实还是充分运用面向对象编程的技巧，要基于接口编程，没错，这里我们在类中Spellchecker是一个接口，至于如何实现，我们不关心，把实现通过构造器注入进去。而它的实现则有spring框架控制，例如通过xml配置文件来声明。本文就介绍到这里，下篇将主要介绍spring中两中两种注入方式。</p>
+
+<h2>小结</h2>
+
+<p>本文简单介绍了依赖注入，下篇更精彩，敬请期待~</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2014/4/3/spring-dependency-injection.html">http://www.cocosk.com/articles/<sup>2014</sup>⁄<sub>4</sub>/3/spring-dependency-injection.html</a></li>
+<li>作者：卧雪Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2014-04-03 23:52:00</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+

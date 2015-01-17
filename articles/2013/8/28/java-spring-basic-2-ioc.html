@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">Spring新手攻略(2)–IoC容器</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted Aug 28, 2013 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>一、Spring容器简介</h2>
+
+<p>一说起Spring框架，其最原始最核心的便是Spring容器了，当然随着Spring的不断发展，Spring也增加
+诸如Security，Batch等框架，虽然它们是独立于Spring framework的。但是很多东西的核心基础还是Spring
+容器的概念，所以可以说Spring容器是Spring的基石。而“容器”这个说法也是个相当形象的概念，这个所谓的Spring
+容器简单的来说就是用来容纳Spring对象的（Spring beans）。它相当于一个工厂，可以在里面创建对象，
+配置对象，管理对象的整个生命周期，直到对象销毁。但为什么又叫做IoC（Inversion of control）容器呢？
+那么先来看看什么是IoC：</p>
+
+<blockquote>
+<p>###<strong>控制反转(IoC)是面向对象编程中的一种设计原则，可以用来减低计算机代码之间的耦合度。其中最常见的方式叫做依赖注入（Dependency_Injection，简称DI）</strong></p>
+</blockquote>
+
+<p>知道了IoC的概念，就简单多了。因为Spring容器就是采用依赖注入来组织对象的。至于如何组织的，那就是Spring的事情了。
+它通过读取装有配置信息的配置元数据(configuration metadata)来创建，配置和装配对象。
+这个配置元数据可以是XML，Java Annotation或者是Java代码。因为上述原因，所以可以称Spring容器为IoC容器。</p>
+
+<h2>二、Spring的两种容器</h2>
+
+<p>Spring框架提供了两种类型的容器如下：</p>
+
+<ul>
+<li>Spring BeanFactory 容器。</li>
+<li>Spring ApplicationContext 容器。</li>
+</ul>
+
+<p>之前也说过，Spring容器相当一个工厂，这不上面出现了BeanFactory(Bean工厂)。BeanFactory容器是最简单的容器，提供基本的依赖注入，
+由org.springframework.beans.factory.BeanFactory接口定义。由于要向后兼容，仍旧有很多第三方框架使用旧的接口，所以它还有一些其他相关接口，如BeanFactoryAware， InitializingBean， DisposableBean。
+而那个ApplicationContext容器由org.springframework.context.ApplicationContext接口定义，它包括了BeanFactory容器的所有功能，且提供了比BeanFactory容器更多企业级应用的相关功能，例如解析properties文件中的文本，
+将事件发布到监听事件的监听器。因此，在企业级应用中可能用的更多些。而对于那些轻量级的应用，如手机应用或者applet应用，需要内存的使用是你最大的瓶颈时，而且你又不需要用到ApplicationContext的很多功能的时候，可以使用BeanFactory。
+知道了这些基础概念后，让我们来动手实践下吧。</p>
+
+<h2>三、创建基于BeanFactory容器的例子</h2>
+
+<p>首先引用相关的Spring包：spring-beans-3.2.4.RELEASE.jar和spring-core-3.2.4.RELEASE.jar。里面的-3.2.4.RELEASE部分
+是版本号，你的可能和这里不一样。为什么我不把所有Spring引入？因为BeanFactory只用到这两个包的内容，把别的弄进来
+太浪费了。接下来就可以写代码了：</p>
+
+<ul>
+<li><p>创建一个BeanFactoryDemo的类用来测试BeanFactory，然后再新建一个User类，代表用户类，User类如下：</p>
+
+<p>public class User {</p>
+
+<pre class="prettyprint linenums">private String name;
+private String password;
+
+
+public User() {
+}
+
+
+public void setName(String name) {
+    this.name = name;
+}
+
+
+public String getName() {
+    return this.name;
+}
+
+
+public void setPassword(String password) {
+    this.password = password;
+}
+
+
+public String getPassword() {
+    return this.password;
+}
+</pre>
+
+<p>}</p></li>
+</ul>
+
+<p>然后编写BeanFactory如下：</p>
+
+<pre class="prettyprint linenums">import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.core.io.ClassPathResource;
+
+public class BeanFactoryDemo {
+
+    public static void main(String[] args) {
+        XmlBeanFactory factory = new XmlBeanFactory(new ClassPathResource(&#34;Beans.xml&#34;));
+        User user = (User) factory.getBean(&#34;user&#34;);
+        System.out.println(user.getName());
+    }
+
+}
+</pre>
+
+<p>是不是很简单，首先定义了一个User类，然后在BeanFactory类中来使用这个类。如何使用的呢？我们看到
+首先生成一个XmlBeanFactory（它是BeanFactory接口的一个实现类）一个从xml加载Bean的工厂类，这个工厂类的构造函数使用ClassPathResource
+读取Beans.xml文件。然后使用factory.getBean(“user”)就获得User类的对象实例了，最后，我们试图打印
+user对象的名字属性，是不是很神奇？我们没有new一个User啊，当然了，这就是Spring容器的工作嘛。user对象
+从工厂中生产出来了，当然我们还缺少了Beans.xml文件，马上写起来：</p>
+
+<pre class="prettyprint linenums">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
+    xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+    xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd&#34;&gt;
+
+    &lt;bean id=&#34;user&#34; class=&#34;sk.spring.tuto.demo2.User&#34;&gt;
+        &lt;property name=&#34;name&#34; value=&#34;Sirk&#34;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+&lt;/beans&gt;
+</pre>
+
+<p>记得把上述Bean.xml文件放到java项目的src目录下，然后编译运行。结果出现异常：Caused by: java.lang.ClassNotFoundException: org.apache.commons.logging.LogFactory
+结果发现Spring还依赖org.apache.commons.logging包，我们加入后在编译运行,结果会打印出Sirk。仔细的马上
+可以发现这个是在xml文件中定义的，哈哈，怎么回事？后续再讲，先这么用着。</p>
+
+<h2>四、创建基于ApplicationContext容器的例子</h2>
+
+<p>在创建之前先来了解下一些基本知识。相比于BeanFactory容器来说，ApplicationContext容器拥有更多的功能，这也就
+意味着要引入更多的依赖包。该容器由org.springframework.context.ApplicationContext接口定义。关于该接口，由以下几种实现：</p>
+
+<blockquote>
+<p>###<strong>FileSystemXmlApplicationContext</strong></p>
+</blockquote>
+
+<p>你需要提供这个xml文件的绝对路径给该类的构造器，这个容器就能从xml文件加载你定义好的beans。</p>
+
+<blockquote>
+<p>###<strong>ClassPathXmlApplicationContext</strong></p>
+</blockquote>
+
+<p>对于这个容器，它也是通过传递构造函数的参数去加载beans，只不过传给它的不是物理绝对路径，而只需要一个定义bean的xml文件名，
+但是该文件必须放在CLASSPATH下面。</p>
+
+<blockquote>
+<p>###<strong>WebXmlApplicationContext</strong></p>
+</blockquote>
+
+<p>该容器从web应用内加载定义了beans的xml文件，在之后web部分会具体讲到。</p>
+
+<p>接下来就来实践一下，首先：需要再引入包spring-context-3.2.4.RELEASE.jar和spring-context-support-3.2.4.RELEASE.jar,spring-expression-3.2.4.RELEASE.jar
+然后新建ApplicationContextDemo类：</p>
+
+<pre class="prettyprint linenums">package sk.spring.tuto.demo2;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class ApplicationContextDemo {
+
+    public static void main(String[] args) {
+        ApplicationContext ctx = new ClassPathXmlApplicationContext(&#34;Beans.xml&#34;);
+        User user = (User) ctx.getBean(&#34;user&#34;);
+        System.out.println(user.getName());
+    }
+}
+</pre>
+
+<p>记得上述的Beans.xml放在src目录下编译，和BeanFactory的例子一样。下面再看FileSystemXmlApplicationContext
+的例子：</p>
+
+<pre class="prettyprint linenums">package sk.spring.tuto.demo2;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+
+public class FileSystemXmlApplicationContextDemo {
+    public static void main(String[] args) {
+        ApplicationContext ctx = new FileSystemXmlApplicationContext(&#34;d:/Beans.xml&#34;);
+        User user = (User) ctx.getBean(&#34;user&#34;);
+        System.out.println(user.getName());
+
+    }
+}
+</pre>
+
+<p>记得把Beans.xml放到相应的路径下，这里的示例是d盘下。如果没什么意外，这些例子最终运行会打印：Sirk。</p>
+
+<h2>五、总结</h2>
+
+<p>最后来总结下IoC容器工作的基本步骤：</p>
+
+<ul>
+<li>首先容器去相应的地方加载定义了beans的xml文件。然后上下文创建了一个Factory（工厂）Bean。
+接着，相应的容器会创建并初始化在xml文件中的各个beans对象。</li>
+<li>然后通过getBean方法去获得需要的对象。例如例子中通过getBean(“user”)获得User对象。这里的参数“user”就是
+xml文件中bean的id。通过该id查找到对象并返回，最终转换成User对象。然后就和你用new出来的对象一样，对这个对象
+调用相应的类方法等等等…</li>
+</ul>
+
+<p>参考：<a href="http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/overview.html">http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/overview.html</a></p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2013/8/28/java-spring-basic-2-ioc.html">http://www.cocosk.com/articles/<sup>2013</sup>⁄<sub>8</sub>/28/java-spring-basic-2-ioc.html</a></li>
+<li>作者：Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2013-08-28 21:37:00</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+

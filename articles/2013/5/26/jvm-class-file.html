@@ -1,0 +1,459 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">jvm基础(3)–class文件基础 </h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted May 26, 2013 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>class文件基本内容</h2>
+
+<p>在上一篇中，我们了解了下java源程序通过编译器编译（包括词法分析，语法分析，语义分析等）最终生成class文件的基本过程，
+本篇主要将讲解class文件的基本内容等知识。class文件是一个非常重要的东西，因为在以后的文章中，我们将以class文件为
+基础，进一步了解jvm的运行。好了，先开始本篇的学习吧。
+一个class文件主要包括以下几部分内容：</p>
+
+<blockquote>
+<p>###<strong>结构信息</strong></p>
+</blockquote>
+
+<p>主要描述了class文件的格式版本号和各个部分的数量与大小的信息。</p>
+
+<blockquote>
+<p>###<strong>元数据</strong></p>
+</blockquote>
+
+<p>对应于java源码中的“声明”和“常量”信息，主要包括：类，继承的超类，实现的接口的声明信息、
+域（Field）、方法信息和常量池。</p>
+
+<blockquote>
+<p>###<strong>方法信息</strong>
+java源码中对应的“语句”和“表达式”信息。主要包括：字节码、异常处理器表、求值栈的类型记录、
+调试符号信息。</p>
+</blockquote>
+
+<p>了解了以上信息后，还是来看一段程序以及由它生成的class文件，来具体分析。</p>
+
+<h2>一个具体的例子</h2>
+
+<pre class="prettyprint linenums">public class Test{
+    private static final int ZERO = 0;
+    private static int  all= 88;
+
+    public int div(int one,int other) throws Exception{
+
+        if(other == ZERO){
+            throw new Exception(&#34;can&#39;t be zero!&#34;);
+        }
+        return (all-one)/other;
+
+    }
+}
+</pre>
+
+<p>在面的代码是一个简单的例子。其中包括了静态属性，常量，异常等的声明，通过</p>
+
+<pre class="prettyprint linenums">javac -g Test.java
+</pre>
+
+<p>编译，其中的-g是为了编译生成包括所有调试信息的class文件。这些调试信息包括：局部变量名和行号。编译后
+就生成了Test.class文件，接着我们通过javap工具来查看它的内容–</p>
+
+<pre class="prettyprint linenums">javap -c -s -l -verbose Test
+</pre>
+
+<p>如果一切顺利，就可以看到如下一些内容，我们会分部分来具体讨论：</p>
+
+<pre class="prettyprint linenums">public class Test extends java.lang.Object
+    SourceFile: &#34;Test.java&#34;
+    minor version: 0
+major version: 50
+</pre>
+
+<p>上述是文件最开始的部分。第一句说明Test这个类继承自java.lang.Object这个超类，也就是声明了继承信息。
+第二句说明该class文件是由Test.java这个源文件编译来的。第三、四句是class文件格式版本号，其中minor version:0
+是次版本号为0，而major为主版本号为50，对应的jdk为6。如果major为49则jdk相应版本为1.5,48相应为1.4。具体信息如下:</p>
+
+<ul>
+<li>JDK 1.0 -> major version 45 and minor version 3</li>
+<li>JDK 1.1 -> major version 45 and minor version 3</li>
+<li>JDK 1.2 -> major version 46 and minor version 0</li>
+<li>JDK 1.3 -> major version 47 and minor version 0</li>
+<li>JDK 1.4 -> major version 48 and minor version 0</li>
+<li>JDK 1.5 -> major version 49 and minor version 0</li>
+<li>JDK 1.6 -> major version 50 and minor version 0</li>
+<li>JDK 1.7 -> major version 51 and minor version 0</li>
+</ul>
+
+<p>第二部分：</p>
+
+<pre class="prettyprint linenums">Constant pool:
+const #1 = Method       #7.#29; //  java/lang/Object.&#34;&lt;init&gt;&#34;:()V
+const #2 = class        #30;    //  java/lang/Exception
+const #3 = String       #31;    //  can&#39;t be zero!
+const #4 = Method       #2.#32; //  java/lang/Exception.&#34;&lt;init&gt;&#34;:(Ljava/lang/String;)V
+const #5 = Field        #6.#33; //  Test.all:I
+const #6 = class        #34;    //  Test
+const #7 = class        #35;    //  java/lang/Object
+const #8 = Asciz        ZERO;
+const #9 = Asciz        I;
+const #10 = Asciz       ConstantValue;
+const #11 = int 0;
+const #12 = Asciz       all;
+const #13 = Asciz       &lt;init&gt;;
+const #14 = Asciz       ()V;
+const #15 = Asciz       Code;
+const #16 = Asciz       LineNumberTable;
+const #17 = Asciz       LocalVariableTable;
+const #18 = Asciz       this;
+const #19 = Asciz       LTest;;
+const #20 = Asciz       div;
+const #21 = Asciz       (II)I;
+const #22 = Asciz       one;
+const #23 = Asciz       other;
+const #24 = Asciz       StackMapTable;
+const #25 = Asciz       Exceptions;
+const #26 = Asciz       &lt;clinit&gt;;
+const #27 = Asciz       SourceFile;
+const #28 = Asciz       Test.java;
+const #29 = NameAndType #13:#14;//  &#34;&lt;init&gt;&#34;:()V
+const #30 = Asciz       java/lang/Exception;
+const #31 = Asciz       can&#39;t be zero!;
+const #32 = NameAndType #13:#36;//  &#34;&lt;init&gt;&#34;:(Ljava/lang/String;)V
+const #33 = NameAndType #12:#9;//  all:I
+const #34 = Asciz       Test;
+const #35 = Asciz       java/lang/Object;
+const #36 = Asciz       (Ljava/lang/String;)V;
+</pre>
+
+<p>以上部分是常量池，存放了所有的Field名称，方法名，方法签名，类型名，代码及class文件中的常量值。</p>
+
+<pre class="prettyprint linenums">public Test();
+  Signature: ()V
+  LineNumberTable:
+  line 1: 0
+  LocalVariableTable:
+  Start  Length  Slot  Name   Signature
+  0      5      0    this       LTest;
+  Code:
+  Stack=1, Locals=1, Args_size=1
+  0:   aload_0
+  1:   invokespecial   #1; //Method java/lang/Object.&#34;&lt;init&gt;&#34;:()V
+  4:   return
+  LineNumberTable:
+  line 1: 0
+  LocalVariableTable:
+  Start  Length  Slot  Name   Signature
+0      5      0    this       LTest;
+</pre>
+
+<p>上述片段是将符号输入到符号表时生成的默认构造方法。Signature：方法签名。LineNumberTable：对应的字节码
+的源码行号信息。Code：字节码信息。LocalVariableTable：局部变量信息。</p>
+
+<pre class="prettyprint linenums">public int div(int, int)   throws java.lang.Exception;
+  Signature: (II)I
+  LineNumberTable:
+  line 7: 0
+  line 8: 4
+  line 10: 14
+
+  LocalVariableTable:
+  Start  Length  Slot  Name   Signature
+  0      22      0    this       LTest;
+  0      22      1    one       I
+  0      22      2    other       I
+
+
+  Code:
+  Stack=3, Locals=3, Args_size=3
+  0:   iload_2
+  1:   ifne    14
+  4:   new     #2; //class java/lang/Exception
+  7:   dup
+  8:   ldc     #3; //String can&#39;t be zero!
+  10:  invokespecial   #4; //Method java/lang/Exception.&#34;&lt;init&gt;&#34;:(Ljava/lang/String;)V
+  13:  athrow
+  14:  getstatic       #5; //Field all:I
+  17:  iload_1
+  18:  isub
+  19:  iload_2
+  20:  idiv
+  21:  ireturn
+  LineNumberTable:
+  line 7: 0
+  line 8: 4
+  line 10: 14
+
+ LocalVariableTable:
+ Start  Length  Slot  Name   Signature
+ 0      22      0    this       LTest;
+ 0      22      1    one       I
+ 0      22      2    other       I
+</pre>
+
+<p>上述片段中，1，2两行是Test方法的元数据信息。而接下来的各部分与前面所说的默认构造方法一样，也包括字节码信息，LineNumberTable，
+LocalVariableTable等。这些内容具体将在jvm深入部分再分析，目前就了解这些。再看最后一些片段：</p>
+
+<pre class="prettyprint linenums">StackMapTable: number_of_entries = 1
+frame_type = 14 /* same */
+</pre>
+
+<p>上面片段这部分记录有分支的情况。如if,for,while等。</p>
+
+<pre class="prettyprint linenums">Exceptions:
+throws java.lang.Exception
+static {};
+Signature: ()V
+LineNumberTable:
+line 3: 0
+Code:
+Stack=1, Locals=0, Args_size=0
+0:   bipush  88
+2:   putstatic       #5; //Field all:I
+5:   return
+LineNumberTable:
+line 3: 0
+</pre>
+
+<p>上述片段是异常处理器表。至此对于class文件的基本内容介绍的差不多了。</p>
+
+<h2>小结</h2>
+
+<p>本篇简单介绍并粗略了解了下class文件。在此基础上，下篇中将详细介绍class文件在jvm中的加载机制等内容。</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2013/5/26/jvm-class-file.html">http://www.cocosk.com/articles/<sup>2013</sup>⁄<sub>5</sub>/26/jvm-class-file.html</a></li>
+<li>作者：Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2013-05-26 23:22:00</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+

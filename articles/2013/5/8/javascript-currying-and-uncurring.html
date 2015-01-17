@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">javascript–柯里化(Curring)</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted May 8, 2013 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>javascript Curring 基本概念</h2>
+
+<p>在看javascript中的Curring之前，先了解下什么是Curring，引用wiki上的解释：
+在计算机科学中，柯里化（Currying），是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。
+柯里化的作用就如上所述，可以简化参数，在某些时候可以让程序看起来更简单。这样也与数学中函数的
+特性保持一致了（函数完全变成「接受一个参数；返回一个值」的固定形式）。对于那些函数式语言（如lisp,Haskell）
+来说，可以容易的实现Curring，因为函数是“一等公民”，在函数编程中，似乎所有工作都围绕者函数进行，
+函数一般作用就是接收参数（包括函数参数），处理逻辑，返回处理结果（包括返回一个函数）。javascript作为一门支持函数式编程的
+语言来说，当然也是可以实现Curring的。如下的例子：</p>
+
+<blockquote>
+<p>###<strong>处理两个参数函数的Curring</strong></p>
+</blockquote>
+
+<p>假设有一个连接两个字符串的函数：
+    function concatStr(str1,str2){
+                return str1 + str2;
+    }
+现在根据柯里化方法，把它变成接收一个参数，并返回一个函数。所以我们再定义一个Curring函数：
+    var curring = function(fn,str2){
+        return function(str1){
+          return fn(str1,str2);
+        }
+    }</p>
+
+<p>最后调用：
+    var concata = curring(concatStr,‘a’);//将concatStr函数简化参数，将返回的匿名函数赋值给concata变量
+    console.log(concata(‘b’));//调用Curring化后的函数，传递的参数作为原函数的第一个参数</p>
+
+<blockquote>
+<p>###<strong>推广到处理多个参数函数的Curring</strong></p>
+</blockquote>
+
+<pre class="prettyprint linenums">function concatStr(){
+            var fullStr;
+            var Args = Array.prototype.slice.call(arguments);
+            for(var i = 0;i &lt; Args.length;i++){
+                fullStr += Args[i];
+            }
+            return Args;
+        }
+
+var curring = function(fn){
+            var aArgs = Array.prototype.slice.call(arguments,1);
+            return function(){
+                var bArgs = Array.prototype.slice.call(arguments),
+                     abArgs = aArgs.concat(bArgs);
+                     return fn.apply(null,abArgs);
+            }
+}
+
+//调用
+var concata = curring(concatStr,&#39;a&#39;,&#39;c&#39;,&#39;d&#39;);
+alert(concata(&#39;b&#39;));
+</pre>
+
+<blockquote>
+<p>###<strong>更有意义的例子</strong></p>
+</blockquote>
+
+<pre class="prettyprint linenums">var space = {
+            id : &#39;1&#39;,
+            getId : function(){
+                setTimeout(function(){
+                    console.log(this.id);
+                },1000);
+            }
+
+        };
+        space.getId();
+</pre>
+
+<p>上述程序本想得到id，但是在senTimeout函数中，this的作用域已经发生变化,不在指向space,为了可以正确获得id，可以修改如下：
+    var space = {
+                id : ‘1’,
+                getId : function(){
+                   var self = this;
+                    setTimeout(function(){
+                        console.log(self.id);
+                    },1000);
+                }</p>
+
+<pre class="prettyprint linenums">};
+</pre>
+
+<p>上述代码通过构造将this变量赋值给self，利用闭包的性质，使得setTimeout中匿名函数执行的时候继续能引用到this。
+这是一种方法，我们也可以通过上面的curring函数，将外面的id传递给匿名函数：</p>
+
+<pre class="prettyprint linenums">var space = {
+    id : &#39;1&#39;,
+    getId : function(){
+    setTimeout(curring(function(id){
+    console.log(id);
+    },this.id),1000);
+    }   
+};
+</pre>
+
+<p>似乎看上去比前面的方法更晕了，哈哈哈，这也是函数式编程的精妙所在呀，其实本质上还是利用了闭包的性质。</p>
+
+<h2>本篇小结</h2>
+
+<p>介绍了柯里化（Curring）的基本概念，并通过几个简单的例子通过javascript来实现，都是些基础知识，往后再往深处研究。</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2013/5/8/javascript-currying-and-uncurring.html">http://www.cocosk.com/articles/<sup>2013</sup>⁄<sub>5</sub>/8/javascript-currying-and-uncurring.html</a></li>
+<li>作者：Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2013-05-08 22:58:00</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+

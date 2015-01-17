@@ -1,0 +1,452 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">spring新手攻略（11）-注入集合</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted Apr 7, 2014 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>前言</h2>
+
+<p>这几天放假，昨天把网站主题稍微改了下，所以没继续更新，今天趁热打铁，继续spring新手攻略系列。有时候真的是需要长期坚持，虽然文章不长，也没什么复杂的东西，但是坚持完成却似乎很难。因为每次都会把某系列文章更新到一半就没了，所以这次决定下狠心一定要写完了，所以，今天我们继续，今天主要讲下spring注入中对于集合类（Collection）的注入。如果你看了本系列的前几篇文章，对于今天的内容，其实是非常熟悉的，其实说到底还是注入的概念，只是注入的东西不一样了，而且你会发现使用spring其实只要遵循它规定的那种模式，其实使用起来非常方便，当然这里只是指对于初级玩家使用。为什么这么说，因为spring用起来非常简单，但是本身框架的设计确有很多可以学习鉴戒之处，对于这部分，希望今后能有机会写写。好吧，那么今天就正式进入主题：</p>
+
+<h2>几种注入的集合配置元素</h2>
+
+<ul>
+<li>《list》使用该配置元素，可以注入一个list，这个list可以包含重复元素值</li>
+<li>《set》使用该配置元素，可以注入一个set集合，不能包含重复元素</li>
+<li>《map》使用该配置元素，就是注入一个map类型，包含任意类型的键值对元素。</li>
+<li>《props》使用该配置元素，注入一个集合，里面是string类型的键值对元素。</li>
+</ul>
+
+<blockquote>
+<p>上述几种配置元素，你应该你能猜到，它们就是bean的xml配置文件中的元素，你可以使用<list>或者<set>来放任何 java.util.Collection 的实现类或者数组（array）。另外对于放入集合的元素可以是基本类型或者是另一个bean的引用。下面来看一个综合示例：</p>
+</blockquote>
+
+<pre class="prettyprint linenums">package sirk_spring_tuto.demo;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+public class CollectionsDemo {
+private List&lt;String&gt; nameList;
+private Set&lt;String&gt; nameSet;
+private Map&lt;String, String&gt; nameMap;
+private Properties nameProp;
+
+public List&lt;String&gt; getNameList() {
+    return nameList;
+}
+public void setNameList(List&lt;String&gt; nameList) {
+    this.nameList = nameList;
+}
+public Set&lt;String&gt; getNameSet() {
+    return nameSet;
+}
+public void setNameSet(Set&lt;String&gt; nameSet) {
+    this.nameSet = nameSet;
+}
+public Map&lt;String, String&gt; getNameMap() {
+    return nameMap;
+}
+public void setNameMap(Map&lt;String, String&gt; nameMap) {
+    this.nameMap = nameMap;
+}
+public Properties getNameProp() {
+    return nameProp;
+}
+public void setNameProp(Properties nameProp) {
+    this.nameProp = nameProp;
+}
+
+
+}
+
+
+package sirk_spring_tuto.demo;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class CollectionsMain {
+
+public static void main(String[] args) {
+    ApplicationContext ctx = new ClassPathXmlApplicationContext(&#34;CollectionBeans.xml&#34;);
+    CollectionsDemo collectionsDemo = (CollectionsDemo) ctx.getBean(&#34;collectionsDemo&#34;);
+    System.out.println(collectionsDemo.getNameList());
+    System.out.println(collectionsDemo.getNameSet());
+    System.out.println(collectionsDemo.getNameMap());
+    System.out.println(collectionsDemo.getNameProp());
+
+}
+
+}
+
+
+&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
+xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd&#34;&gt;
+
+&lt;bean id=&#34;collectionsDemo&#34; class=&#34;sirk_spring_tuto.demo.CollectionsDemo&#34;&gt;
+    &lt;property name=&#34;nameList&#34;&gt;
+        &lt;list&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+            &lt;value&gt;sirk&lt;/value&gt;
+            &lt;value&gt;hello&lt;/value&gt;                
+        &lt;/list&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameSet&#34;&gt;
+        &lt;set&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+            &lt;value&gt;sirk&lt;/value&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+        &lt;/set&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameMap&#34;&gt;
+        &lt;map&gt;
+            &lt;entry key=&#34;hello&#34; value=&#34;sirk&#34;/&gt;
+            &lt;entry key=&#34;good&#34; value=&#34;day&#34;/&gt;
+        &lt;/map&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameProp&#34;&gt;
+        &lt;props&gt;
+            &lt;prop key=&#34;one&#34;&gt;hello&lt;/prop&gt;
+            &lt;prop key=&#34;two&#34;&gt;world&lt;/prop&gt;
+        &lt;/props&gt;
+    &lt;/property&gt;
+
+&lt;/bean&gt;
+
+&lt;/beans&gt;
+</pre>
+
+<p>最后执行打印如下结果：</p>
+
+<pre class="prettyprint linenums">[hello, sirk, hello]
+[hello, sirk]
+{hello=sirk, good=day}
+{two=world, one=hello}
+</pre>
+
+<h2>注入Bean的引用</h2>
+
+<p>前一个例子中放入集合中的元素都是值元素，如果要放入其它bean的引用，可以配置配置文件如下：</p>
+
+<pre class="prettyprint linenums">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
+xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd&#34;&gt;
+
+&lt;bean id=&#34;collectionsDemo&#34; class=&#34;sirk_spring_tuto.demo.CollectionsDemo&#34;&gt;
+    &lt;property name=&#34;nameList&#34;&gt;
+        &lt;list&gt;
+            &lt;ref bean=&#34;XXX&#34;/&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+            &lt;value&gt;sirk&lt;/value&gt;
+            &lt;value&gt;hello&lt;/value&gt;                
+        &lt;/list&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameSet&#34;&gt;
+        &lt;set&gt;
+            &lt;ref bean=&#34;XXX&#34;/&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+            &lt;value&gt;sirk&lt;/value&gt;
+            &lt;value&gt;hello&lt;/value&gt;
+        &lt;/set&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameMap&#34;&gt;
+        &lt;map&gt;
+            &lt;entry key=&#34;hello&#34; value=&#34;sirk&#34;/&gt;
+            &lt;entry key=&#34;good&#34; value=&#34;day&#34;/&gt;
+            &lt;entry key=&#34;YYY&#34; value-ref=&#34;XXX&#34;&gt;&lt;/entry&gt;
+        &lt;/map&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&#34;nameProp&#34;&gt;
+        &lt;props&gt;
+            &lt;prop key=&#34;one&#34;&gt;hello&lt;/prop&gt;
+            &lt;prop key=&#34;two&#34;&gt;world&lt;/prop&gt;
+        &lt;/props&gt;
+    &lt;/property&gt;
+
+&lt;/bean&gt;
+
+&lt;/beans&gt;
+</pre>
+
+<p>这配置其实混合使用了值类型和引用类型，请注意那些带有ref的标签元素。就是对于引用类型的用法。</p>
+
+<h2>注入null和空字符串</h2>
+
+<p>最后再来看看如何注入null和空字符串：</p>
+
+<blockquote>
+<p>如果想注入null，请看下面配置</p>
+</blockquote>
+
+<pre class="prettyprint linenums">&lt;bean id=&#34;...&#34; class=&#34;exampleBean&#34;&gt;
+    &lt;property name=&#34;telephone&#34;&gt;&lt;null/&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</pre>
+
+<p>这好比调用了exampleBean.setTelephone(null)</p>
+
+<blockquote>
+<p>如果想注入空字符串，看下面配置：</p>
+</blockquote>
+
+<pre class="prettyprint linenums">&lt;bean id=&#34;...&#34; class=&#34;exampleBean&#34;&gt;
+     &lt;property name=&#34;telephone&#34; value=&#34;&#34;/&gt;
+&lt;/bean&gt;
+</pre>
+
+<p>该配置好比调用了exmapleBean.setTelephone(“”)</p>
+
+<h2>小结</h2>
+
+<p>本文介绍了spring对于集合的注入，下篇更精彩，敬请期待~</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2014/4/7/spring-injecting-collection.html">http://www.cocosk.com/articles/<sup>2014</sup>⁄<sub>4</sub>/7/spring-injecting-collection.html</a></li>
+<li>作者：卧雪Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2014-04-07 23:52:00</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+

@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">javascript–闭包实践(Closure Practice)</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted Jun 22, 2013 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>javascript Closure 基本概念</h2>
+
+<p>javascript中的闭包（和数学中的闭包是不一样的），这个概念这里就不详细说了，网上有一堆堆的文章来讲述什么是闭包。而今天，不在这里讲述概念问题，因为概念是一个
+可以很简单描述也可以很复杂描述的东西，而且有时候可能越描述的详细就越让人迷糊。笔者也是如此，之前看了很多这类文章，时而清楚，时而糊涂。
+今天我们撇开概念，其实闭包这个东西真没什么好讲的，平时如果用不到呢，就别去故意构造闭包把代码搞得自己都看不懂了，这和乱用设计模式是一个做法(以上只是一家之言，如果你是
+高手，而且非常了解语言的底层实现或者不在乎别人看得懂看不懂就当我之前啥都没说过，哈哈哈)。不知不觉已经讲了那么多废话了，嘿嘿，马上回来。
+今天，要说的其实很简单，就如本文的题目一样，是一次实践。这个实践在下文我就会给出，当然这个实践是实践项目中遇到的问题，不过为了
+简化逻辑，还是有些修改的，因为实际项目中的一些业务就没必要添加进来凑热闹了，我们只关注闭包是如何巧妙的解决问题的。</p>
+
+<blockquote>
+<p>###<strong>问题描述</strong>
+如下代码：</p>
+</blockquote>
+
+<pre class="prettyprint linenums">&lt;input type=&#34;button&#34; value=&#34;load_finish&#34; id=&#34;loaded&#34; /&gt;
+    &lt;script type=&#34;text/javascript&#34;&gt;
+
+        var plugin = {
+            load : function(ctx){
+                var btn = document.getElementById(&#39;loaded&#39;);
+                    //为了简化模型，
+                    //这里用按钮点击事件监听模拟加载完毕的事件
+                    //实际可能是异步加载其它资源的完成事件监听
+                    //当然有些情况确实是对于dom元素的事件监听，那就确实是这个样子的。
+                    addEvent(btn,&#39;click&#39;,function(){
+                        //加载插件完成后触发回调
+                        ctx.finish();
+                    });
+
+            }
+
+        };
+        //客户端调用插件
+        for(var i = 0;i &lt; 5;i++){
+            plugin.load({
+                finish : function(){
+                    //编写回调函数，由于某种需求，我们需要
+                    //知道循环每次变量i的值
+                    alert(&#39;load finished&#39; + i);
+                }
+            });
+
+        }
+
+        //辅助函数
+        function addEvent(elem,type,fn){
+            if(document.addEventListener){
+                elem.addEventListener(type,fn,false);
+            }else if(document.attachEvent){
+                elem.attachEvent(&#39;on&#39; + type,fn);
+            }else{
+                elem[&#39;on&#39;+type] = fn();
+            }
+        }
+&lt;/script&gt;
+</pre>
+
+<p>但是悲剧的事情是，运行程序后，发现每次的i打印的都是5，这可不是我们想要的结果。为什么会这样呢？根据闭包的定义，
+addEvent(btn,‘click’,function(){})中的匿名函数引用了ctx这个外部函数load（ctx）的局部变量,因此
+每个addEvent(btn,‘click’,function(){})中的匿名函数的作用域链中都保存着load函数的活动对象，且随着load函数的每次执行，活动对象
+不会被销毁。而ctx每次在load结束后就会被销毁，在ctx中又引用了外部作用域的i，最后i变成了5，那最后的ctx中的i就是5。
+从另一个角度来看，让我们再来到finish函数执行的时候，查看此时它的作用域链，
+我们发现一个是他自己的变量对象，然后是ctx对象的变量对象，然后还有外部的变量i所在环境的变量对象。然后当执行的时候在自己变量对象查找
+i，没找到，往上在ctx中发现之前load函数执行时候，引用了ctx，而ctx引用了i，因此找到了，而通过前面分析ctx是同一个，因此i最后都是5了。
+那么，这个怎么破？。</p>
+
+<blockquote>
+<p>###<strong>使用闭包解决问题</strong></p>
+</blockquote>
+
+<pre class="prettyprint linenums">//客户端调用插件
+for(var i = 0;i &lt; 5;i++){
+    (function(num){
+        plugin.load({
+                finish : function(){
+                     //编写回调函数，由于某种需求，我们需要
+                     //知道循环每次变量i的值
+                        alert(&#39;load finished&#39; + num);
+                    }
+                  });
+           })(i);
+}
+</pre>
+
+<p>其它不变，修改客户端调用的地方，这里，我们增加了一个自执行的匿名函数。然后传入参数i，这样当里面的回调函数中引用的就变成了
+匿名函数的局部变量num，而num其实就是每次循环i赋值过来的。现在在执行finish时候变成查找num了。原来每次循环load函数执行后i变量被ctx引用
+后本次i就销毁了。最后一次i变成5给ctx引用。而经过修改的代码中，当引用num时候num是匿名自执行函数中的变量，形成闭包，因此每次load执行，ctx对象将继续在内存中，不会被销毁，最后就有多个ctx的引用，每个ctx保存着每次的i值。因此就能输出正常结果了。</p>
+
+<h2>本篇小结</h2>
+
+<p>本以为是一个有趣的闭包的问题，尼玛刚开始写以为很简单，越写越觉得是个大坑，结果，硬生生的去填了，最后发现有好多问题，由于水平有限，
+以上文章很多地方未实际验证，分析过程不一定正确，但是解决方案没问题，确实实现了效果。如有更好办法或者哪里有问题，不惜赐教。</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2013/6/22/javascript-closure-practice.html">http://www.cocosk.com/articles/<sup>2013</sup>⁄<sub>6</sub>/22/javascript-closure-practice.html</a></li>
+<li>作者：Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2013-06-22 11:58:00</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+

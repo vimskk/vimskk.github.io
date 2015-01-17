@@ -1,0 +1,378 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">算法基础(1)–子数组求最大和问题</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted Jul 27, 2013 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>一、问题介绍</h2>
+
+<p>给定一个数组a[n],求数组a的连续元素的子数组的和的最大值。</p>
+
+<h2>二、问题分析</h2>
+
+<p>根据题目意思，将抽象的描述化为具体：假设给定的数组为a[n],n=7,数组元素为{2,3,-22,5,11,-8,88},根据题意，
+最后的结果应该为b[m] = {5,11,-8,88},sum(b) = 96。那么，根据这个意思，很快我们就可以想到一个算法：
+用三个指针i,j,k(注意这里的指针不是程序语言中的指针，这里可以理解为一个在数组上滑动的游标)。我们让i
+指向数组第一个元素，j指向i循环到n，k指向i循环到j，i遍历一遍数组。这样i=[0,n),j=[i,n)，k=[i,j]。
+其中k区间就是任意连续元素的数组，这样就可以求出每一个子数组的和。当i=0时候:求子数组{2}的和，子数组{2,3}的和…;当i=1时候:求子数组{3}的和,{3,-22}
+的和,……然后根据所有子数组求出最大值就是了。代码如下：</p>
+
+<pre class="prettyprint linenums">int getSumOne(int a[],int len){
+    int i,j,k;
+    int maxsum = a[0];
+    for(i = 0;i &lt; len;i++){
+        for(j = i;j &lt; len;j++){
+            int sum = 0;
+            for(k = i;k &lt;= j;k++){
+                sum += a[k];
+            }//子数组和
+            if(sum &gt; maxsum){
+                maxsum = sum;
+            }
+        }
+    }
+    return maxsum;
+}
+</pre>
+
+<p>上面的程序时间复杂度为O(n^3)，确实有点复杂呀，其实稍微思考下，就会发现，上述程序我们是通过不断
+比较最大值maxsum和当前子数组的和sum，将大的赋给maxsum。其实，当求子数组[i,j]的和的最大值，就是
+求max{[i,j-1],[i,j]},因此没必要每次都丢弃上一个子数组的sum，比如子数组sum({2})=2,则sum({2,3})=
+sum({2})+a[1] = 5,虽然当子数组扩展的时候，可能有负数元素，但是maxsum中保存的始终是最大值。所以代码修改为：</p>
+
+<pre class="prettyprint linenums">int getSumTwo(int a[],int len){
+    int i,j;
+    int maxsum = a[0];
+    for(i = 0;i &lt; len;i++){
+        int sum = 0;
+        for(j = i;j &lt; len;j++){
+            sum += a[j];
+            if(sum &gt; maxsum){
+                maxsum = sum;
+            }
+        }
+    }
+    return maxsum;
+}
+</pre>
+
+<p>通过这样的变化，时间复杂度降低到了O(n^2)了。但是，还是有点复杂，所以要继续想办法。这次改用分治的思想，
+将解决规模为n的问题，递归解决两个规模近似n/2的子问题，然后合并结果。大概的思路就是，将问题n的向量
+分解为大小差不多的两个子向量a,b，然后子向量再分解，以此递归求解。对于每次a,b的求解，其实最大子向量
+要么在a中，要么在b中，或者在跨域a,b之间的向量。然后最后取得最大的解就是所求的解了。看代码：</p>
+
+<pre class="prettyprint linenums">//O(nlog(n))
+int getSumThree(int a[],int start,int end){
+    int i,m;
+    int sum=0,maxsum1,maxsum2;
+    int maxsum=0;
+    int lsum = 0,rsum = 0;
+
+    if(start &gt; end){
+        return 0;
+    }
+    if(start == end){
+       return a[start];
+    }
+    m = start + (end - start) / 2;
+    maxsum1 = a[m],sum = 0;
+    for(i = m;i &gt;= start;i--){
+        sum += a[i];
+        if(sum &gt; maxsum1){
+           maxsum1 = sum;
+        }
+
+    }
+    maxsum2 = a[m + 1], sum = 0;
+    for(i = m + 1;i &lt;= end;i++){
+        sum += a[i];
+        if(sum &gt; maxsum2){
+            maxsum2 = sum;
+        }
+    }
+    maxsum = maxsum1 + maxsum2;
+
+    lsum = getSumThree(a,start,m);
+
+    if(maxsum &lt; lsum){
+        maxsum = lsum;
+    }
+    rsum = getSumThree(a,m+1,end);
+
+    if(maxsum &lt; rsum){
+        maxsum = rsum;
+    }
+    return maxsum;
+}
+</pre>
+
+<p>好家伙，代码相比之前的多了不少，但这是最好了吗？答案是否定的，因为还有更好的，而且代码量也比上面的
+少，真是万幸啊。最后，可以达到O(n)的时间复杂度，思路也是很简单的，我们只需要扫描一遍数组，然后每次将
+最大的累加和sum与所求出的最大和maxsum比较，如果大了，则替换最大和。当遇到sum累计和为负数时，就丢弃前面的累计和变量sum。
+如果当前元素大于sum，则将该数赋值给sum，继续扫描累加求maxsum。如下代码：</p>
+
+<pre class="prettyprint linenums">int getSumFour(int a[],int len){
+   int i;
+   int maxsum = a[0];
+   int sum = a[0];
+   for(i = 1;i &lt; len;i++){
+
+       sum += a[i];
+       if(sum &lt; 0){
+            if(a[i] &gt; sum){
+                sum = a[i];
+            }
+
+       }
+       if(sum &gt; maxsum){
+            maxsum = sum;
+
+       }
+
+   }
+    return maxsum;
+}
+</pre>
+
+<h2>总结</h2>
+
+<p>简单总结了下求最大子数组和的方法。</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2013/7/27/algorithms-subarray.html">http://www.cocosk.com/articles/<sup>2013</sup>⁄<sub>7</sub>/27/algorithms-subarray.html</a></li>
+<li>作者：Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2013-07-27 13:52:00</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+

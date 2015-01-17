@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">Spring新手攻略(3)–Bean定义</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted Aug 30, 2013 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>一、Bean简介</h2>
+
+<p>在上一篇中，我们已经看到过Bean了，在Spring中，Bean是一个由IoC容器管理的实例化的对象。通过它可以获得
+实例化的POJO对象，另外Bean还包含一些配置元数据（configuration metadata），
+配置元数据是在XML中的进行定义，然后IoC容器根据元数据的定义创建bean，配置bean并管理bean的整个生命周期。</p>
+
+<blockquote>
+<p>###<strong>配置属性主要由以下几种</strong></p>
+</blockquote>
+
+<ul>
+<li>class : 这个是必须的属性，用来指定创建bean对象的类。</li>
+<li>name : 该属性指定了bean的唯一标识。在基于xml文件配置元数据的方式中，可以使用id或者name来指定
+唯一标识。</li>
+<li>id : 在基于XML的配置元数据中，’id’是bean的唯一标识符，每个bean只能对应一个id。</li>
+<li>scope : 该属性指定bean的作用域，一般是设定为’singleton’或者’prototype’，默认为’singleton’，
+此外还有’request’，’session’，’global-session’。如果作用域是singleton的话，容器内同一个id的bean只产生一个实例；如果作用域是prototype的话，容器内允许产生多个实例。</li>
+<li>constructor-arg : 该属性用来通过构造器注入依赖。在讲到依赖注入的时候会具体讲解。</li>
+<li>property : 该属性也是用来注入依赖的，不过是通过setter来进行依赖注入的。</li>
+<li>autowire模式 : 用于自动装配bean。</li>
+<li>lazy-init模式 : 通过它对bean设置是否延迟初始化，如果指定”true”,则会进行延迟初始化，
+即不是在容器初始的时候创建bean而是第一次进行使用的时候创建。</li>
+<li>init-method : 通过该属性可以指定初始化方法，指定bean的所有其他属性都设置了之后调用的回调函数。</li>
+<li>destroy-method : 通过该属性可以指定销毁方法，指定当包含bean的容器销毁时调用的回调函数。</li>
+</ul>
+
+<h2>二、Spring配置元数据</h2>
+
+<p>IoC容器的配置元数据主要由下面三种方式：</p>
+
+<ul>
+<li>通过XML配置文件</li>
+<li>通过Annotation(注解)配置</li>
+<li>通过Java代码配置</li>
+</ul>
+
+<p>今天主要讲解通过XML配置文件来进行相关配置的示例。</p>
+
+<h2>三、创建基于XML配置元数据的例子</h2>
+
+<p>首先引用上一篇的代码，修改下配置文件：</p>
+
+<pre class="prettyprint linenums">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+    &lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
+    xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+    xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd&#34;&gt;
+
+    &lt;!-- 一个简单的bean定义 --&gt;
+    &lt;bean id=&#34;user&#34; class=&#34;sk.spring.tuto.demo2.User&#34;&gt;
+        &lt;!-- 定义属性 --&gt;
+        &lt;property name=&#34;name&#34; value=&#34;Sirk&#34;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+    &lt;!-- 定义bean设置lazy-init --&gt;
+    &lt;bean id=&#34;user&#34; class=&#34;sk.spring.tuto.demo2.User2&#34; lazy-init=&#34;true&#34;&gt;
+        &lt;!-- 定义属性 --&gt;
+        &lt;property name=&#34;name&#34; value=&#34;Sirk&#34;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 定义bean设置初始化回调方法 --&gt;
+    &lt;bean id=&#34;user&#34; class=&#34;sk.spring.tuto.demo2.User3&#34; init-method=&#34;init&#34;&gt;
+        &lt;!-- 定义属性 --&gt;
+        &lt;property name=&#34;name&#34; value=&#34;Sirk&#34;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 定义bean设置bean销毁时的回调方法 --&gt;
+    &lt;bean id=&#34;user&#34; class=&#34;sk.spring.tuto.demo2.User4&#34; init-method=&#34;destory&#34;&gt;
+        &lt;!-- 定义属性 --&gt;
+        &lt;property name=&#34;name&#34; value=&#34;Sirk&#34;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+&lt;/beans&gt;
+</pre>
+
+<h2>五、总结</h2>
+
+<p>本篇初略介绍了bean的定义，以及定义bean可以设置的一些属性。在之后的文章中将逐步详细讲解这些属性等知识。</p>
+
+<p>参考：<a href="http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/overview.html">http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/overview.html</a></p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2013/8/30/java-spring-basic-3-bean-def.html">http://www.cocosk.com/articles/<sup>2013</sup>⁄<sub>8</sub>/30/java-spring-basic-3-bean-def.html</a></li>
+<li>作者：Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2013-08-30 21:37:00</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+

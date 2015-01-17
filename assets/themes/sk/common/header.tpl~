@@ -1,0 +1,45 @@
+{{define "header"}}
+<header>
+    <div class="container">
+        <div class="profile">
+            <div class="social">
+                <a href="http://twitter.com/">
+                    <div data-picture data-alt="Twitter">
+                        <div data-src="/assets/themes/{{"theme"|get}}/img/twitter16.png"></div>
+                        <div data-src="/assets/themes/{{"theme"|get}}/img/twitter32.png"     data-media="(-webkit-min-device-pixel-ratio: 2)"></div>
+                        <noscript><img src="/assets/themes/{{"theme"|get}}/img/twitter16.png" alt="Twitter"></noscript>
+                    </div>
+                </a>
+                <a href="http://github.com/scottkiss">
+                    <div data-picture data-alt="Github">
+                        <div data-src="/assets/themes/{{"theme"|get}}/img/octocat16.png"></div>
+                        <div data-src="/assets/themes/{{"theme"|get}}/img/octocat32.png"     data-media="(-webkit-min-device-pixel-ratio: 2)"></div>
+                        <noscript><img src="/assets/themes/{{"theme"|get}}/img/octocat16.png" alt="Github"></noscript>
+                    </div>
+                </a>
+            </div>
+            <div class="avatar" data-picture data-alt="avatar">
+                <div data-src="https://avatars3.githubusercontent.com/u/1182545?s=54"></div>
+                <div data-src="https://avatars3.githubusercontent.com/u/1182545?s=54" data-media="(-webkit-min-device-pixel-ratio: 2)"></div>
+
+            </div>
+        </div>
+        <h5 class="logo"><a href="http://cocosk.com">{{"title"|get}}</a></h5>
+        <nav class="main">
+            <ul>
+           <li><a href="/" class="active">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		<li><a href="/rss.xml" class="rss" title="feed">RSS</a></li>
+            </ul>
+        </nav>
+        <div class="nav-slider">
+            <div class="nav-selection index"></div>
+        </div>
+       
+       
+    </div>
+</header>
+{{end}}

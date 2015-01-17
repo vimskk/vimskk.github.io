@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">cocos2d-x 3.0学习-创建菜单场景</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted Jun 22, 2014 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>一、创建菜单场景</h2>
+
+<p>我们在一个游戏中，通常打开游戏后都会有一个菜单场景，在菜单场景中你可以点击开始按钮，也可以点击其它例如设置等按钮。这是一个非常通用的场景，今天就来尝试创建一个menu的场景。</p>
+
+<h2>二、简单的例子 - hello Menu Scene</h2>
+
+<p>首先创建一个场景类:</p>
+
+<p>MenuScene.h</p>
+
+<pre class="prettyprint linenums">#ifndef __MENU_SCENE_H__
+#define __MENU_SCENE_H__
+
+
+#include &#34;cocos2d.h&#34;
+
+using namespace cocos2d;
+
+class MenuScene:public Scene{
+public:
+    MenuScene();
+    ~MenuScene();
+    virtual bool init();
+    CREATE_FUNC(MenuScene);
+
+};
+#endif
+</pre>
+
+<p>MenuScene.cpp</p>
+
+<pre class="prettyprint linenums">#include &#34;MenuScene.h&#34;
+#include &#34;MenuLayer.h&#34;
+#include &#34;BackgroundLayer.h&#34;
+
+MenuScene::MenuScene(){};
+MenuScene::~MenuScene(){};
+
+bool MenuScene::init(){
+    if(!Scene::init()){
+        return false;
+    }
+
+    auto bgLayer = BackgroundLayer::create();
+    if(bgLayer){
+        this-&gt;addChild(bgLayer);
+    }
+
+    auto menuLayer = MenuLayer::create();
+    if(menuLayer){
+        this-&gt;addChild(menuLayer);
+    }
+
+    return true;
+}
+</pre>
+
+<p>可以看到在实现类中，我们在Scene中添加了两个层，一个是背景层，一个是菜单层。背景层就不说了，和创建普通层没什么区别，只是在层中添加一个背景图而已。下面看下菜单层：
+MenuLayer.h</p>
+
+<pre class="prettyprint linenums">#ifndef __MENU_LAYER_H__
+#define __MENU_LAYER_H__
+
+#include &#34;cocos2d.h&#34;
+
+using namespace cocos2d;
+
+class MenuLayer:public Layer{
+public:
+    virtual bool init();
+    CREATE_FUNC(MenuLayer);
+    void menuStartCallback(Object *sender);
+
+};
+#endif
+</pre>
+
+<p>MenuLayer.cpp</p>
+
+<pre class="prettyprint linenums">#include &#34;MenuLayer.h&#34;
+#include &#34;GameScene.h&#34;
+
+bool MenuLayer::init(){
+if(!Layer::init()){
+    return false;
+}
+Point origin = Director::getInstance()-&gt;getVisibleOrigin();
+Size visiableSize = Director::getInstance()-&gt;getVisibleSize();
+SpriteFrame *playBtnFrmae = SpriteFrameCache::getInstance()-&gt;getSpriteFrameByName(&#34;play_btn.png&#34;);
+auto playBtn = Sprite::createWithSpriteFrame(playBtnFrmae);
+auto activePlayBtn = Sprite::createWithSpriteFrame(playBtnFrmae);
+activePlayBtn-&gt;setPositionY(7);
+auto menuItem  = MenuItemSprite::create(playBtn,activePlayBtn,NULL,CC_CALLBACK_1(MenuLayer::menuStartCallback, this));
+menuItem-&gt;setPosition(Point(origin.x + visiableSize.width/2 ,origin.y + visiableSize.height*2/5));
+
+auto menu = Menu::create(menuItem,NULL);
+menu-&gt;setPosition(Point(origin.x ,origin.y));
+this-&gt;addChild(menu,1);
+return true;
+}
+
+void MenuLayer::menuStartCallback(Object *sender){
+    log(&#34;start game...&#34;);
+    auto gameScene = GameScene::create();
+    TransitionScene *transition = TransitionFade::create(1,gameScene);
+    Director::getInstance()-&gt;replaceScene(transition);
+}
+</pre>
+
+<p>在菜单层中的init函数中，通过MenuItemSprite::create(playBtn,activePlayBtn,NULL,CC_CALLBACK_1(MenuLayer::menuStartCallback, this));创建了一个基于精灵的菜单项，其中第一个参数是一个精灵，第二个也是，只不过对第二个进行了Y方向的偏移。这样做的目的是第一个参数是正常情况菜单项显示的精灵（可以简单认为图片），第二个是当选中菜单项时候菜单项显示的精灵，这样就形成了动态效果。第三个参数是无效时候的菜单项显示，这里不需要所以是NULL，第四个参数是一个回调函数，就是当点击菜单项时候触发的函数。于是当点击的时候，就会调用：</p>
+
+<pre class="prettyprint linenums">void MenuLayer::menuStartCallback(Object *sender){
+    log(&#34;start game...&#34;);
+    auto gameScene = GameScene::create();
+    TransitionScene *transition = TransitionFade::create(1,gameScene);
+    Director::getInstance()-&gt;replaceScene(transition);
+}
+</pre>
+
+<p>这里除了打印log外，创建了一个主游戏场景，并通过TransitionScene进行切换场景。还是回到上面，完成创建菜单项后，就可以创建菜单了，只要把菜单项放入菜单即可。当然这里只有一个菜单项，你可以可以尝试创建多个。最后将Menu对象放入层中，就好了。最后效果：</p>
+
+<p><a href="/assets/themes/bs/pic/menu.png"><img src="/assets/themes/bs/pic/menu.png" alt="" />
+</a></p>
+
+<p>长得有点丑，哈哈，这里只是通过一个简单的例子来展示如何创建菜单场景的，你可以尝试加入更好看的元素，创建一个更漂亮的菜单场景。当然创建菜单的过程类似。</p>
+
+<h2>总结</h2>
+
+<p>一个小例子，展示如何在cocos2d-x中创建菜单场景。</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2014/6/22/cocos2d-x-3-menu.html">http://www.cocosk.com/articles/<sup>2014</sup>⁄<sub>6</sub>/22/cocos2d-x-3-menu.html</a></li>
+<li>作者：卧雪Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2014-06-22 10:50:00</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+

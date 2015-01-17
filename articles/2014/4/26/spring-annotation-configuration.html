@@ -1,0 +1,472 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">spring新手攻略（13）- spring注解(annotation)配置</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted Apr 26, 2014 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>前言</h2>
+
+<p>在<a href="http://cocosk.com/articles/2014/4/13/spring-autowire.html">上一篇</a>中，我们介绍了spring自动装配(autowire)的特性。而从系列一开始，我们似乎就一直在xml配置文件中捣鼓，包括上篇的自动装配。不过，自从spring2.5开始，spring还支持了基于注解(annotation)的配置方式。那么这篇我们就来介绍下这个特性，看看它能给我们带来多大的惊喜。</p>
+
+<h2>基于annotation的配置</h2>
+
+<p>在默认情况下，spring的annotation是没有开启的，为了支持这一特性，我们需要修改下配置文件如下：</p>
+
+<pre class="prettyprint linenums">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
+xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+xmlns:context=&#34;http://www.springframework.org/schema/context&#34;
+xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd&#34;&gt;
+    &lt;context:annotation-config&gt;&lt;/context:annotation-config&gt;
+&lt;/beans&gt;
+</pre>
+
+<p>只要加入</p>
+
+<pre class="prettyprint linenums">&lt;context:annotation-config&gt;&lt;/context:annotation-config&gt;
+</pre>
+
+<p>上面这个配置，你就可以通过注解(annotation)的方式来完成上一篇中同样自动装配bean的功能。这个如何做？暂且保密，等等哦，往下看会有的。</p>
+
+<h2>几个常用的annotation</h2>
+
+<ul>
+<li>@Required 这个注解应用于bean的setter方法。</li>
+<li>@Autowired 这个注解应用于bean的属性setter方法，构造方法，属性等。</li>
+<li>@Qualifier 这个注解一般会和@Autowired一起出现，当有多个bean具有相同类型的时候，你可以通过这个注解来明确指定是哪个bean。</li>
+<li>JSR-250 Annotations spring还支持@Resource,@PostConstruct和@PreDestroy annotations等基于JSR-250的annotation。</li>
+</ul>
+
+<p>还挺多，新手会不会晕了，不过别担心，今天我们之挑一个和上篇有关的，剩下的下次介绍，这样做原因一是为了保持和上篇的连贯性，二是不要让新手一次接受太多东西，三呢是作者偷懒，今天不想写那么多了。。</p>
+
+<h2>@Autowired 注解</h2>
+
+<p>没错，今天就是它了，从名称可以看出它也是自动装配嘛，比上篇的基于xml的自动装配形象多了，当时才没有告诉我们呢，只是说了个byName什么的。什么？你记得了？那赶紧回去看上一篇吧。好了，那我们继续还是以上篇的例子。首先，我们将Beans.xml改成下面那样:</p>
+
+<pre class="prettyprint linenums">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
+xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+xmlns:context=&#34;http://www.springframework.org/schema/context&#34;
+xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd&#34;&gt;
+
+    &lt;context:annotation-config&gt;&lt;/context:annotation-config&gt;
+
+    &lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34;&gt;&lt;/bean&gt; 
+    &lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt;
+&lt;/beans&gt;
+</pre>
+
+<p>然后再修改TV.java：</p>
+
+<pre class="prettyprint linenums">package sirk_spring_tuto.demo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class TV {
+
+/**
+ * 这里给属性增加自动装配注解
+ */
+@Autowired
+private Screen screen;
+
+
+
+public void powerOn(){
+    this.screen.show();
+}
+
+public Screen getScreen() {
+    return screen;
+}
+
+public void setScreen(Screen screen) {
+    this.screen = screen;
+}
+}
+</pre>
+
+<p>最后其他文件都不变，最后运行：</p>
+
+<pre class="prettyprint linenums">package sirk_spring_tuto.demo;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class App {
+
+public static void main(String[] args) {
+    ApplicationContext ctx = new ClassPathXmlApplicationContext(&#34;Beans.xml&#34;);
+    TV tv = (TV) ctx.getBean(&#34;tv&#34;);
+    tv.powerOn();
+
+}
+
+}
+</pre>
+
+<p>如果没有什么错误，结果将会和上一篇一样。但是竟然出错了：</p>
+
+<pre class="prettyprint linenums">Caused by: java.lang.NoClassDefFoundError: org/springframework/core/type/AnnotatedTypeMetadata
+</pre>
+
+<p>看到如此异常，不必惊慌，没找到类，一定是忘记导入什么包了，原来在xml配置中新加入的context定义需要用到spring-context包，于是加入。最终终于运行成功啦。如果你还没成功，一定是什么地方写错了，认真检查哦。</p>
+
+<p>如果已经成功，接着我们来尝试把注解用到setter方法上：</p>
+
+<pre class="prettyprint linenums">public class TV {
+
+
+private Screen screen;
+
+
+
+public void powerOn(){
+    this.screen.show();
+}
+
+public Screen getScreen() {
+    return screen;
+}
+
+/**
+ * 这里给属性增加自动装配注解
+ */
+@Autowired
+public void setScreen(Screen screen) {
+    this.screen = screen;
+}
+}
+</pre>
+
+<p>一样可以哦，再来试下构造方法:</p>
+
+<pre class="prettyprint linenums">public class TV {
+
+private Screen screen;
+
+
+/**
+ * 这里给属性增加自动装配注解
+ */
+@Autowired
+public TV(Screen sc){
+    this.screen = sc;
+}
+
+
+public void powerOn(){
+    this.screen.show();
+}
+
+public Screen getScreen() {
+    return screen;
+}
+
+
+public void setScreen(Screen screen) {
+    this.screen = screen;
+}
+}
+</pre>
+
+<p>是不是很简单？除了这几种用法，它还有另一种用法:</p>
+
+<pre class="prettyprint linenums">package sirk_spring_tuto.demo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+
+
+public class TV {
+
+
+private Screen screen;
+private RemoteControl rc;
+
+
+/**
+ * 这里给属性增加自动装配注解
+ */
+@Autowired
+public TV(Screen sc){
+    this.screen = sc;
+}
+
+
+public void powerOn(){
+    this.screen.show();
+}
+
+public Screen getScreen() {
+    return screen;
+}
+
+
+public void setScreen(Screen screen) {
+    this.screen = screen;
+}
+
+public RemoteControl getRc() {
+    return rc;
+}
+
+@Autowired(required = false)
+public void setRc(RemoteControl rc) {
+    this.rc = rc;
+}
+
+}
+</pre>
+
+<p>这里我们给电视机类新增了遥控属性，并且我们没有修改xml配置文件，也就是说，我们没有在配置文件中配置遥控类的bean，但是在setRc方法上面我们写的是：</p>
+
+<pre class="prettyprint linenums">@Autowired(required = false)
+</pre>
+
+<p>这样，尽管没有着要装配的bean，但是因为required是false，所以也没有报错，如果你去掉required=false，只留下@Autowired那就不一样了。这种用法实际不多，就不详细展开了。</p>
+
+<h2>小结</h2>
+
+<p>今天介绍了spring的基于annotation的配置，并以上篇为例子，使用@Autowired注解实现了下，并简要介绍了spring的几种主要注解，下文将介绍剩下的几种注解。</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2014/4/26/spring-annotation-configuration.html">http://www.cocosk.com/articles/<sup>2014</sup>⁄<sub>4</sub>/26/spring-annotation-configuration.html</a></li>
+<li>作者：卧雪Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2014-04-26 11:52:00</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+
