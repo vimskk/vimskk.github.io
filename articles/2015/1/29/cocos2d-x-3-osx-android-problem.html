@@ -77,10 +77,10 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">算法基础(2)–栈(一)</h1>
+      <h1 class="entry-title">cocos2d-x 3.0学习- OS X 系统中将cocos2d-x项目移植到Android问题</h1>
       <p class="meta">
         
-<time data-updated="true" pubdate="" >Posted Feb 10, 2014 </time>
+<time data-updated="true" pubdate="" >Posted Jan 29, 2015 </time>
         
 		
          | <a href="#duoshuo_thread">评论</a>
@@ -91,110 +91,44 @@
 
 
 <div class="entry-content">
-<h2>一、问题介绍</h2>
-
-<p>第一部分介绍栈的基本概念，以及使用Go语言实现基于linked-list的下压堆栈。</p>
-
-<h2>二、关于栈的描述</h2>
-
-<blockquote>
-<p>简单的说，栈是一种(LIFO)*先进后出*的数据结构。虽然简单，但是在实际开发中却用处巨大，下面我们首先列出对于栈我们可以操作的基本API：</p>
-</blockquote>
+<h2>一、出现问题现象</h2>
 
 <ul>
-<li>push(Item item)</li>
-<li>pop() Item</li>
-<li>isEmpty() bool</li>
-<li>size() int</li>
+<li><p>编译.so文件成功，运行模拟器报错如下：</p>
+
+<p>Caused by: java.lang.UnsatisfiedLinkError: Couldn’t load cocos2dcpp: findLibrary returned null</p></li>
+
+<li><p>真机运行正常</p></li>
 </ul>
 
-<p>基本的操作接口有了，因为比较简单，就不多介绍了，接下来就直接上代码（本篇基于链表实现）：</p>
+<p>二、如何解决
+经过分析，明显是虽然生成了.so的文件，但是没有被android加载，难道说，名称错了？但是真机环境是好的，而且之前在windows平台下也时没问题的。而且名称确实也是没问题的，最后可以肯定是OS X系统下环境有差别，经过网络搜索，发现OS X系统下创建的模拟器cpu是armeabi-v7a的，而cocos2d-x生成的android项目模版没有指定生成armeabi-v7a类型的APP_ABI。找到原因了，默认生成的so文件只有放在libs/armeabi/libcocos2dcpp.so，所以要想应用在模拟器中正常运行需要copy一份so文件，在libs下，加入libs/armeabi－v7a/libcocos2dcpp.so。这样再运行模拟器久可以正常了，但是这样做不是每次都得copy下，这也太麻烦了。所以，我们必须找到更好的办法，请看下文揭晓。</p>
 
-<pre class="prettyprint linenums">package main
+<p>三、更完美的解决
+其实如果要想生成多个类型cpu支持，只需要修改Application.mk文件。</p>
 
-import (
-    &#34;fmt&#34;
-)
-
-type Node struct {
-    Data interface{}
-    Next *Node
-}
-
-type Stack struct {
-    First *Node
-    Num   int
-}
-
-func (s *Stack) Push(data interface{}) {
-    oldFirst := s.First
-    d := new(Node)
-    d.Data = data
-    s.First = d
-    d.Next = oldFirst
-    s.Num++
-}
-
-func (s *Stack) Pop() interface{} {
-    first := s.First
-    s.First = first.Next
-    s.Num--
-    return first.Data
-}
-
-func (s *Stack) IsEmpty() bool {
-    return s.First == nil
-}
-
-func (s *Stack) Size() int {
-    return s.Num
-}
-
-func main() {
-    var s *Stack = new(Stack)
-    fmt.Println(s.IsEmpty())
-    fmt.Println(s.Size())
-    s.Push(&#34;a&#34;)
-    fmt.Println(s.Size())
-    s.Push(&#34;b&#34;)
-    fmt.Println(s.Size())
-    s.Push(&#34;c&#34;)
-    s.Push(10000)
-    fmt.Println(s.Pop())
-    fmt.Println(s.IsEmpty())
-    fmt.Println(s.Pop())
-    fmt.Println(s.Size())
-    fmt.Println(s.Pop())
-    fmt.Println(s.Pop())
-    fmt.Println(s.Size())
-    fmt.Println(s.IsEmpty())
-    fmt.Println(s.Pop())
-
-}
+<pre class="prettyprint linenums">APP_ABI := armeabi armeabi-v7a
 </pre>
 
-<p>上述实现中主要用到了两个结构，一个是Node struct，一个是Stack
-struct,其中Node表示链表中的一个节点，而Stack则是栈的定义。基于链表的栈引用着指向first第一个节点的指针，因此我们可以看到Stack结构的成员包括一个First的Node类型的指针，除此之外还有一个Num表示节点数目。下面主要介绍Push操作和Pop操作:</p>
+<p>加入上面所示的代码,然后就可以了。当然，还可以继续支持更多的：</p>
 
-<ul>
-<li><p>Push操作只需要创建新节点，然后将新节点指向Stack的第一个节点，新节点的Next指向之前的第一个节点。</p></li>
+<pre class="prettyprint linenums">APP_ABI := armeabi armeabi-v7a x86 mips
+</pre>
 
-<li><p>Pop操作则更简单，只需要将Stack的第一个节点的下一个节点指向Stack的第一个节点。并返回之前的第一个节点需要的数据。</p></li>
-</ul>
+<p>如果说NDK r7＋版本，还可以</p>
 
-<h2>时间复杂度</h2>
+<pre class="prettyprint linenums">APP_ABI := all
+</pre>
 
-<p>对于push和pop操作，时间复杂度都为O(1)</p>
+<h2>总结下呢</h2>
 
-<h2>总结</h2>
-
-<p>介绍了栈以及通过Go语言实现了基于链表的栈，下篇将继续介绍基于数组实现的栈。</p>
+<p>记录下cocos2d-x-3x在OS X系统下运行android模拟器遇到的一个小问题</p>
 
 <p>##文档信息</p>
 
 <ul>
 <li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
-<li>原文网址：<a href="http://www.cocosk.com/articles/2014/2/10/algorithms-stacks-1.html">http://www.cocosk.com/articles/<sup>2014</sup>⁄<sub>2</sub>/10/algorithms-stacks-1.html</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2015/1/29/cocos2d-x-3-osx-android-problem.html">http://www.cocosk.com/articles/<sup>2015</sup>⁄<sub>1</sub>/29/cocos2d-x-3-osx-android-problem.html</a></li>
 <li>作者：卧雪Sirk</li>
 </ul>
 
@@ -204,7 +138,7 @@ struct,其中Node表示链表中的一个节点，而Stack则是栈的定义。�
     <p class="meta">
 <span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
 
-<time data-updated="true" pubdate="" >2014-02-10 22:01:00</time>
+<time data-updated="true" pubdate="" >2015-01-29 22:00:00</time>
       
 
 <span class="categories">
