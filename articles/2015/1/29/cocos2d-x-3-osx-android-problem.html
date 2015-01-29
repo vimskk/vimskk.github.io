@@ -77,10 +77,10 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">hadoop2.0.0编译遇到的错误</h1>
+      <h1 class="entry-title">cocos2d-x 3.0学习- OS X 系统中将cocos2d-x项目移植到Android问题</h1>
       <p class="meta">
         
-<time data-updated="true" pubdate="" >Posted Apr 1, 2014 </time>
+<time data-updated="true" pubdate="" >Posted Jan 29, 2015 </time>
         
 		
          | <a href="#duoshuo_thread">评论</a>
@@ -91,77 +91,44 @@
 
 
 <div class="entry-content">
-<h2>前言</h2>
-
-<p>由于hadoop2.2.0官方未提供64位的可执行版本，所以只能通过下载源代码自己进行编译，本文以这几天笔者实际编译过程中遇到的错误（不保证一定会遇到）作为记录参考。</p>
-
-<h2>编译运行环境</h2>
+<h2>一、出现问题现象</h2>
 
 <ul>
-<li>ubuntu 64位</li>
+<li><p>编译.so文件成功，运行模拟器报错如下：</p>
+
+<p>Caused by: java.lang.UnsatisfiedLinkError: Couldn’t load cocos2dcpp: findLibrary returned null</p></li>
+
+<li><p>真机运行正常</p></li>
 </ul>
 
-<h2>遇到的错误</h2>
+<p>二、如何解决
+经过分析，明显是虽然生成了.so的文件，但是没有被android加载，难道说，名称错了？但是真机环境是好的，而且之前在windows平台下也时没问题的。而且名称确实也是没问题的，最后可以肯定是OS X系统下环境有差别，经过网络搜索，发现OS X系统下创建的模拟器cpu是armeabi-v7a的，而cocos2d-x生成的android项目模版没有指定生成armeabi-v7a类型的APP_ABI。找到原因了，默认生成的so文件只有放在libs/armeabi/libcocos2dcpp.so，所以要想应用在模拟器中正常运行需要copy一份so文件，在libs下，加入libs/armeabi－v7a/libcocos2dcpp.so。这样再运行模拟器久可以正常了，但是这样做不是每次都得copy下，这也太麻烦了。所以，我们必须找到更好的办法，请看下文揭晓。</p>
 
-<blockquote>
-<p>[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:2.5.1:testCompile (default-testCompile) on project hadoop-auth: Compilation failure: Compilation failure:
-[ERROR] /Users/JuneMAC/hadoop/release-2.2.0/hadoop-common-project/hadoop-auth/src/test/java/org/apache/hadoop/security/authentication/client/AuthenticatorTestCase.java:[88,11] 错误: 无法访问AbstractLifeCycle</p>
-</blockquote>
+<p>三、更完美的解决
+其实如果要想生成多个类型cpu支持，只需要修改Application.mk文件。</p>
 
-<p>解决方案:</p>
-
-<pre class="prettyprint linenums">vi hadoop-common-project/hadoop-auth/pom.xml
+<pre class="prettyprint linenums">APP_ABI := armeabi armeabi-v7a
 </pre>
 
-<p>在</p>
+<p>加入上面所示的代码,然后就可以了。当然，还可以继续支持更多的：</p>
 
-<pre class="prettyprint linenums"> &lt;dependency&gt;
-      &lt;groupId&gt;org.mortbay.jetty&lt;/groupId&gt;
-      &lt;artifactId&gt;jetty&lt;/artifactId&gt;
-      &lt;scope&gt;test&lt;/scope&gt;
- &lt;/dependency&gt;
+<pre class="prettyprint linenums">APP_ABI := armeabi armeabi-v7a x86 mips
 </pre>
 
-<p>前面加上</p>
+<p>如果说NDK r7＋版本，还可以</p>
 
-<pre class="prettyprint linenums"> &lt;dependency&gt;
-      &lt;groupId&gt;org.mortbay.jetty&lt;/groupId&gt;
-      &lt;artifactId&gt;jetty-util&lt;/artifactId&gt;
-      &lt;scope&gt;test&lt;/scope&gt;
- &lt;/dependency&gt;
+<pre class="prettyprint linenums">APP_ABI := all
 </pre>
 
-<blockquote>
-<p>[exec] CMake Error at /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake:57 (MESSAGE):
-[exec]   Could NOT find ZLIB (missing: ZLIB_INCLUDE_DIR)
-[exec] Call Stack (most recent call first):
-[exec]   /usr/share/cmake/Modules/FindZLIB.cmake:22 (FIND_PACKAGE_HANDLE_STANDARD_ARGS)
-[exec]   CMakeLists.txt:89 (find_package)
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-antrun-plugin:1.6:run (make) on project hadoop-common: An Ant BuildException has occured: exec returned: 1 -> [Help 1]</p>
-</blockquote>
+<h2>总结下呢</h2>
 
-<p>解决方案:
-安装
-<a href="http://www.zlib.net/">http://www.zlib.net/</a></p>
-
-<blockquote>
-<p>错误
-Could NOT find OpenSSL, try to set the path to OpenSSL root folder in the<br />
-[exec]   system variable OPENSSL_ROOT_DIR (missing: OPENSSL_LIBRARIES</p>
-</blockquote>
-
-<p>解决方案：
-sudo apt-get install libssl-dev</p>
-
-<h2>小结</h2>
-
-<p>本文并未指出所有可能遇到的错误，这里只是总结在某次编译过程中可能遇到的错误以及解决办法。</p>
+<p>记录下cocos2d-x-3x在OS X系统下运行android模拟器遇到的一个小问题</p>
 
 <p>##文档信息</p>
 
 <ul>
 <li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
-<li>原文网址：<a href="http://www.cocosk.com/articles/2014/4/1/hadoop-build-errors.html">http://www.cocosk.com/articles/<sup>2014</sup>⁄<sub>4</sub>/1/hadoop-build-errors.html</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2015/1/29/cocos2d-x-3-osx-android-problem.html">http://www.cocosk.com/articles/<sup>2015</sup>⁄<sub>1</sub>/29/cocos2d-x-3-osx-android-problem.html</a></li>
 <li>作者：卧雪Sirk</li>
 </ul>
 
@@ -171,7 +138,7 @@ sudo apt-get install libssl-dev</p>
     <p class="meta">
 <span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
 
-<time data-updated="true" pubdate="" >2014-04-01 2:52:00</time>
+<time data-updated="true" pubdate="" >2015-01-29 22:00:00</time>
       
 
 <span class="categories">
@@ -233,6 +200,10 @@ sudo apt-get install libssl-dev</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/articles/2015/1/29/cocos2d-x-3-osx-android-problem.html">cocos2d-x 3.0学习- OS X 系统中将cocos2d-x项目移植到Android问题</a>
+      </li>
+    
+      <li class="post">
         <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
       </li>
     
@@ -246,10 +217,6 @@ sudo apt-get install libssl-dev</p>
     
       <li class="post">
         <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
-      </li>
-    
-      <li class="post">
-        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
       </li>
     
   </ul>

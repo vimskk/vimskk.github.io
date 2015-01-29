@@ -77,62 +77,6 @@
       
   <header class="page-header">
     
-      <h1 class="entry-title"><a href="/articles/2015/1/29/cocos2d-x-3-osx-android-problem.html">cocos2d-x 3.0学习- OS X 系统中将cocos2d-x项目移植到Android问题</a></h1>
-    
-      <p class="meta">
-<time data-updated="true" pubdate="" datetime="2014-04-24T21:58:00+08:00">Jan 29, 2015</time>
-        	
-         | <a href="/articles/2015/1/29/cocos2d-x-3-osx-android-problem.html#duoshuo_thread">评论</a>
-        
-      </p>
-    
-  </header>
-  <div class="entry-content">
-	一、出现问题现象
-
-
-编译.so文件成功，运行模拟器报错如下：
-
-Caused by: java.lang.UnsatisfiedLinkError: Couldn’t load cocos2dcpp: findLibrary returned null
-
-真机运行正常
-
-
-二、如何解决
-经过分析，明显是虽然生成了.so的文件，但是没有被android加载，难道说，名称错了？但是真机环境是好的，而且之前在windows平台下也时没问题的。而且名称确实也是没问题的，最后可以肯定是OS X系统下环境有差别，经过网络搜索，发现OS X系统下创建的模拟器cpu是armeabi-v7a的，而cocos2d-x生成的android项目模版没有指定生成armeabi-v7a类型的APP_ABI。找到原因了，默认生成的so文件只有放在libs/armeabi/libcocos2dcpp.so，所以要想应用在模拟器中正常运行需要copy一份so文件，在libs下，加入libs/armeabi－v7a/libcocos2dcpp.so。这样再运行模拟器久可以正常了，但是这样做不是每次都得copy下，这也太麻烦了。所以，我们必须找到更好的办法，请看下文揭晓。
-
-三、更完美的解决
-其实如果要想生成多个类型cpu支持，只需要修改Application.mk文件。
-
-APP_ABI := armeabi armeabi-v7a
-
-
-加入上面所示的代码,然后就可以了。当然，还可以继续支持更多的：
-
-APP_ABI := armeabi armeabi-v7a x86 mips
-
-
-如果说NDK r7＋版本，还可以
-
-APP_ABI := all
-
-
-总结下呢
-
-记录下cocos2d-x-3x在OS X系统下运行android模拟器遇到的一个小问题
-
-##文
- </div>
-    <footer>
-      <a href="/articles/2015/1/29/cocos2d-x-3-osx-android-problem.html" rel="full-article">阅读更多 →</a>
-    </footer>
-  
-    </article>
-  
- <article>
-      
-  <header class="page-header">
-    
       <h1 class="entry-title"><a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a></h1>
     
       <p class="meta">
@@ -890,6 +834,62 @@ vi hadoop-common-project/hadoop-auth/pom.xml
   
     </article>
   
+ <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/articles/2014/3/4/tesseract-ocr-use.html">linux下安装图片识别引擎tesseract-ocr</a></h1>
+    
+      <p class="meta">
+<time data-updated="true" pubdate="" datetime="2014-04-24T21:58:00+08:00">Mar 4, 2014</time>
+        	
+         | <a href="/articles/2014/3/4/tesseract-ocr-use.html#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+  <div class="entry-content">
+	一、关于tesseract-ocr
+
+tesseract-ocr是一个开源的图片识别引擎，可以用它来处理识别验证码图片等，并且支持多种语言，特别棒的是还提供了训练功能，通过训练生成的训练样本，能大大提高识别率。更多的资料可以参考官网:https://code.google.com/p/tesseract-ocr/
+
+二、安装环境
+
+在windows平台下，官网直接有安装包下载，所以这里主要了介绍如何在Linux平台下编译安装。笔者使用Centos操作系统来实验，其它系统应该类似。
+
+三、安装过程
+
+因为需要编译源码，所以首先安装编译环境：
+&gt; 编译环境: gcc gcc-c&#43;&#43; make
+
+yum install gcc gcc-c&#43;&#43; make
+
+
+接下来还需要autoconf automake libtool libjpeg-devel libpng-devel libtiff-devel zlib-devel这些库：
+
+yum install autoconf automake libtool
+yum install libjpeg-devel libpng-devel libtiff-devel zlib-devel
+
+
+
+(如果是ubuntu系统执行下面：
+
+
+sudo apt-get install libpng12-dev  
+sudo apt-get install libjpeg62-dev  
+sudo apt-get install libtiff4-dev  
+
+
+)
+
+另外tesseract-ocr还依赖leptonica，它同样需要通过源码编译，首先下载它：
+ </div>
+    <footer>
+      <a href="/articles/2014/3/4/tesseract-ocr-use.html" rel="full-article">阅读更多 →</a>
+    </footer>
+  
+    </article>
+  
  
   
 </div>
@@ -935,10 +935,6 @@ vi hadoop-common-project/hadoop-auth/pom.xml
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/articles/2015/1/29/cocos2d-x-3-osx-android-problem.html">cocos2d-x 3.0学习- OS X 系统中将cocos2d-x项目移植到Android问题</a>
-      </li>
-    
-      <li class="post">
         <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
       </li>
     
@@ -956,6 +952,10 @@ vi hadoop-common-project/hadoop-auth/pom.xml
     
       <li class="post">
         <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/5/29/http-server-push.html">java servlet简单实现http服务器推</a>
       </li>
     
   </ul>
