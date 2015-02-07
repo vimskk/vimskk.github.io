@@ -4,8 +4,180 @@
         <title>RSS 订阅酷酷时空</title>
         <link>cocosk.com</link>
         <description>RSS 酷酷时空</description>
-        <lastBuildDate>Thu, 29 Jan 2015 23:54:24 CST</lastBuildDate>
+        <lastBuildDate>Sat, 07 Feb 2015 22:28:58 CST</lastBuildDate>
         <language>zh-cn</language>
+       
+        <item>
+            <title>快速学习ios开发：Objective-C基础(一)</title>
+            <link>2015/2/7/learn-ios-dev-faster-oc-1.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2015-02-07 22:33:10</pubDate>
+            <description>&lt;h2&gt;零、关于快速学习ios开发系列文章&lt;/h2&gt;
+
+&lt;p&gt;为什么会要写这个系列？&lt;/p&gt;
+
+&lt;p&gt;这是个好问题，其实我也不知道这个系列是否会和其他系列一样写着写着就搁置好多了，然后不知道什么时候才更新。但是无所谓，因为本来就是主要用来记录个人学习过程的，如果在这过程中能够帮助到别人也算是一件不错的事情。所以不要太期望文章一定会及时或者持续更新下去，就比如博客中其他文章一样，因为很多也只是记录个人学习历程，如果某个技术在实际工作或者学习中不需要继续深究下去了，可能就不会及时持续更新了，因为要忙的事情实在太多，当然，如果有时间的话，我还是非常希望能把未完结的所有系列文章都给来个大结局。这不，最近入手了Mac，当然得学习学习ios了。如果你也是新手，可以跟着一起玩玩。&lt;/p&gt;
+
+&lt;h2&gt;一、需要准备的&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;一台Mac&lt;/li&gt;
+&lt;li&gt;Mac里装个Xcode，这里版本是6.1.1&lt;/li&gt;
+&lt;li&gt;一只会编程的猴子&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上述三个条件，前面两个应该都比较好搞定，第三个需要一个会编程的猴子，这个条件就比较特殊了，因为每只猴子的基础都不一样啊，什么？你不知道猴子是什么？那估计你不需要往下看了。当然猴子的基础越好，就越能掌握本系列的精髓－快速。所以，在学习过程中绝对不是那种《xxx入门》什么类型的，会花很多时间先来学学oc语言语法，然后一步一步截图展示如何创建一个hello world。所以做好准备，可能在学习过程中，你会需要另外去查阅资料。&lt;/p&gt;
+
+&lt;h2&gt;二、从xxx语言到Objective-C&lt;/h2&gt;
+
+&lt;p&gt;在ios开发中现在可以使用Objective-C或者是Swift开发语言。这里学习为什么不选Swift呢？虽然她比较新，而且相信未来发展也是非常不错的，但是目前第三方支持或者一些坑可能都没有前人踩过，所以还是选择稳定且但比较旧的Objective-C。当然，对于像笔者这样喜欢尝试各种语言的，到时候切换Swift也说不会有任何困难的。所以，这个标题也就变成了xxx语言到Objective-C了，因为笔者并不是从某一种语言转来的，而是一堆。所以我会在不同语言角度来看Objective-C的语法来对比，当然还是会选择一些比较常用的语言。
+所以如果你还没有学过其他编程语言，可能就比较惨了，因为快速入门是建立在之前基础上的，建议还是乖乖的先学习一门语言并熟练运用再回来，不然看了也说浪费时间。&lt;/p&gt;
+
+&lt;h2&gt;三、快速浏览Objective-C&lt;/h2&gt;
+
+&lt;p&gt;既然要快速学，那我们肯定不是去拿本Objective-C的基本语法书从Hello World开始学起，于是我们就站在已经学会的角度去学，听起来有点怪怪的。首先我们来回答个问题，为什么学Objective-C？很明显，我们要拿它来写ios的应用或者游戏，于是，我们就清楚我们要做的了。当然说赶紧的打开Xcode，创建第一个项目。如下图：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;/assets/themes/sk/pic/ios1-1.png&#34;&gt;&lt;img src=&#34;/assets/themes/sk/pic/ios1-1.png&#34; alt=&#34;&#34; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;/assets/themes/sk/pic/ios1-2.png&#34;&gt;&lt;img src=&#34;/assets/themes/sk/pic/ios1-2.png&#34; alt=&#34;&#34; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;按照上创建FirstApp，并设置项目名称等信息，然后可以就可以看下项目的结构了:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;/assets/themes/sk/pic/ios1-3.png&#34;&gt;&lt;img src=&#34;/assets/themes/sk/pic/ios1-3.png&#34; alt=&#34;&#34; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;于是我们从目录结构来猜猜看，马上发现有个main.m的文件，学过C语言的应该有点印象，莫非它也是oc的入口函数，二话不说，打开之：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#import &lt;UIKit/UIKit.h&gt;
+#import &#34;AppDelegate.h&#34;
+
+int main(int argc, char * argv[]) {
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
+}
+&lt;/pre&gt;
+
+&lt;p&gt;好家伙，连main函数参数都和C语言的一样。那来找找不一样的呢，发现开头是#import而不是#include,他们具体异同点如下：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;#import是一个预处理指令，作用跟C语言的#include类似，包含某个文件的内容到预处理指令所在的位置。&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;在C\C&#43;&#43;中，我们用#include来包含头文件，但是同一个头文件可能被包含多次。为了解决这个问题，一般我们会这么写：&lt;/p&gt;
+
+&lt;p&gt;#ifndef &lt;em&gt;APP_H&lt;/em&gt;
+#define &lt;em&gt;APP_H&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;/&lt;em&gt;…..&lt;/em&gt;/&lt;/p&gt;
+
+&lt;p&gt;#endif&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;使用#import来包含头文件，可以自动防止同一个头文件被包含多次。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;#import &lt;xxx&gt;表示包含系统自带的文件，#import “xxx”表示包含开发人员自己创建的文件&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;我们再来看main函数体的内容，发现有个@autoreleasepool，这个是什么东西？写过Java的都应该知道Java的垃圾回收机制，但是OC是不支持垃圾回收的，需要开发人员编写代码来释放对象所占用的内存。这个东西就是OC内存管理的一种东西－自动释放池，使用这个东西就可以方便开发人员不再需要每次手动的retain和release对象，这部分涉及到内存管理比较深入的东西了，暂且不深入了解，后续再说。&lt;/p&gt;
+
+&lt;h2&gt;四、UIApplicationMain&lt;/h2&gt;
+
+&lt;p&gt;我们打开UIApplicationMain的定义&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;UIKIT_EXTERN int UIApplicationMain(int argc, char *argv[], NSString *principalClassName, NSString *delegateClassName);
+&lt;/pre&gt;
+
+&lt;p&gt;嗯，看起来像是一个函数，但是前面有个UIKIT_EXTERN，继续查看源码：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;#import &lt;Availability.h&gt;
+
+#ifdef __cplusplus
+#define UIKIT_EXTERN        extern &#34;C&#34; __attribute__((visibility (&#34;default&#34;)))
+#else
+#define UIKIT_EXTERN            extern __attribute__((visibility (&#34;default&#34;)))
+#endif
+
+#define UIKIT_STATIC_INLINE     static inline
+&lt;/pre&gt;
+
+&lt;p&gt;原来是一个宏定义，其中&lt;strong&gt;cplusplus是cpp中的自定义宏，如果这是一段cpp的代码，那么加入extern”C”和其中的代码。extern是C/C&#43;&#43;语言中表明函数和全局变量作用范围（可见性）的关键字，该关键字告诉编译器，其声明的函数和变量可以在本模块或其它模块中使用。C&#43;&#43;之父在设计C&#43;&#43;之时，考虑到当时已经存在了大量的C代码，为了支持原来的C代码和已经写好C库，需要在C&#43;&#43;中尽可能的支持C，而 extern “C”就是其中的一个策略。&lt;/strong&gt;attribute&lt;strong&gt;是GNU C的一种机制，用法为_attribute&lt;/strong&gt; ((attribute-list))。当项目需要作为一个库被外包引用的时候通常在编译时可以用参数-fvisibility指定所有符号的可见性。在编译命令中加入 -fvisibility=hidden参数，会将所有默认的public的属性变为hidden。此时，如果对函数设置&lt;strong&gt;attribute&lt;/strong&gt;((visibility (“default”)))参数，使特定的函数仍然按默认的public属性处理，则-fvisibility=hidden参数不会对该函数起作用。所以，设置了-fvisibility=hidden参数之后，只有设置了&lt;strong&gt;attribute&lt;/strong&gt;((visibility (“default”)))的函数才是对外可见的。&lt;/p&gt;
+
+&lt;p&gt;上面讲了一大堆，总之呢，就是UIApplicationMain是界面相关的UIKit框架对外可见的一个函数。&lt;/p&gt;
+
+&lt;p&gt;再来看看UIApplicationMain函数，它接收四个参数,其中argc和argv是main函数传过来的，该函数还需要两个字符串参数，用于标识应用程序的首要类（即应用程序对象所属的类）和应用程序委托类。果首要类字符串的值为nil, UIKit就缺省使用UIApplication类；如果应用程序委托类为nil，UIKit就会将应用程序主nib文件（针对通过Xcode模板创建的应用程序）中的某个对象假定为应用程序的委托对象。在这个例子中,应用程序委托类不是nil的，从之前的函数参数类型和参数名称来看，是自定义一个字符串类型的代理类名，但是是这样的：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;NSStringFromClass([AppDelegate class])
+&lt;/pre&gt;
+
+&lt;p&gt;打开NSStringFromClass定义看到：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;FOUNDATION_EXPORT NSString *NSStringFromClass(Class aClass);
+&lt;/pre&gt;
+
+&lt;p&gt;这是FOUNDATION框架中提供的一个底层对外可见的函数，看意思应该是获取一个Class的名称。至于FOUNDATION和UIKIT框架，这里先不详细介绍了，后面准备讲整个ios开发框架架构时候再说。那么里面这个&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;[AppDelegate class]
+&lt;/pre&gt;
+
+&lt;p&gt;是什么意思？这是OC中方法调用的一种语法，其实OC调用方法是使用“消息结构”（messaging structure）而非C&#43;&#43;等语言的“函数调用”（function calling)，关键区别在于：使用消息结构的语言，其运行时所应执行的代码由运行环境来决定；而使用函数调用的语言，则由编译器决定。因此，OC是相当动态的，当调用一个实例的方法，在runtime时向该实例的指针发送消息，实例在收到消息后，从自身的实现中寻找响应这条消息的方法。基本语法如下：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;[实例 方法]; 
+&lt;/pre&gt;
+
+&lt;p&gt;or&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;[类名 方法名];
+&lt;/pre&gt;
+
+&lt;p&gt;前面讲过调用一个类或实例的方法，实际上是给这个类或实例发消息（message）。类或实例称为“接收方”。所以，调用方法的格式也可以理解为：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;[接收方 消息];
+&lt;/pre&gt;
+
+&lt;p&gt;在术语上，整个表达式也叫消息表达式。如果有返回值，那么如下：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;变量＝[接收方 消息];
+&lt;/pre&gt;
+
+&lt;p&gt;如果要传递参数呢：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;[Dog setName:“tom”];
+&lt;/pre&gt;
+
+&lt;p&gt;当然如果有多个参数：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;[接收方 名字1:参数1 名字2:参数2, 名字3:参数3 .. ];
+&lt;/pre&gt;
+
+&lt;p&gt;为了避免声明过多的本地变量保存临时结果，Objective-C允许你使用嵌套消息。每个嵌套消息的返回值可以作为其他消息的参数或者目标。如下：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;[NSString stringWithFormat:[dog getName]];
+&lt;/pre&gt;
+
+&lt;p&gt;虽然这样很方便，但是为了更好的代码可读性，建议避免在一行代码中嵌套调用超过两个方法。&lt;/p&gt;
+
+&lt;p&gt;介绍了那么多关于关于消息传递的知识，现在终于可以理解&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;[AppDelegate class]
+&lt;/pre&gt;
+
+&lt;p&gt;其实意思就是向AppDelegate类发了class消息，那么这个消息（可以理解为一个方法调用）是什么呢？我们继续找到class的定义：&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;&#43; (Class)class;
+&lt;/pre&gt;
+
+&lt;p&gt;在NSObject.h文件中找到了如上的声明，有点类似c&#43;&#43;中头文件中方法的声明。此处又出现奇怪的＋号，这个又是什么呢？请听下回分解。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2015/2/7/learn-ios-dev-faster-oc-1.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2015&lt;/sup&gt;⁄&lt;sub&gt;2&lt;/sub&gt;/7/learn-ios-dev-faster-oc-1.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
        
         <item>
             <title>cocos2d-x 3.0学习-Android中集成Admob插页广告</title>
@@ -1125,229 +1297,6 @@ public void setRc(RemoteControl rc) {
 &lt;ul&gt;
 &lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/4/13/spring-autowire.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;4&lt;/sub&gt;/13/spring-autowire.html&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        </item>
-       
-        <item>
-            <title>spring新手攻略（11）-注入集合</title>
-            <link>2014/4/7/spring-injecting-collection.html</link>
-            <author>卧雪Sirk</author>
-            <pubDate>2014-04-07 23:52:00</pubDate>
-            <description>&lt;h2&gt;前言&lt;/h2&gt;
-
-&lt;p&gt;这几天放假，昨天把网站主题稍微改了下，所以没继续更新，今天趁热打铁，继续spring新手攻略系列。有时候真的是需要长期坚持，虽然文章不长，也没什么复杂的东西，但是坚持完成却似乎很难。因为每次都会把某系列文章更新到一半就没了，所以这次决定下狠心一定要写完了，所以，今天我们继续，今天主要讲下spring注入中对于集合类（Collection）的注入。如果你看了本系列的前几篇文章，对于今天的内容，其实是非常熟悉的，其实说到底还是注入的概念，只是注入的东西不一样了，而且你会发现使用spring其实只要遵循它规定的那种模式，其实使用起来非常方便，当然这里只是指对于初级玩家使用。为什么这么说，因为spring用起来非常简单，但是本身框架的设计确有很多可以学习鉴戒之处，对于这部分，希望今后能有机会写写。好吧，那么今天就正式进入主题：&lt;/p&gt;
-
-&lt;h2&gt;几种注入的集合配置元素&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;《list》使用该配置元素，可以注入一个list，这个list可以包含重复元素值&lt;/li&gt;
-&lt;li&gt;《set》使用该配置元素，可以注入一个set集合，不能包含重复元素&lt;/li&gt;
-&lt;li&gt;《map》使用该配置元素，就是注入一个map类型，包含任意类型的键值对元素。&lt;/li&gt;
-&lt;li&gt;《props》使用该配置元素，注入一个集合，里面是string类型的键值对元素。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;上述几种配置元素，你应该你能猜到，它们就是bean的xml配置文件中的元素，你可以使用&lt;list&gt;或者&lt;set&gt;来放任何 java.util.Collection 的实现类或者数组（array）。另外对于放入集合的元素可以是基本类型或者是另一个bean的引用。下面来看一个综合示例：&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;package sirk_spring_tuto.demo;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-public class CollectionsDemo {
-private List&lt;String&gt; nameList;
-private Set&lt;String&gt; nameSet;
-private Map&lt;String, String&gt; nameMap;
-private Properties nameProp;
-
-public List&lt;String&gt; getNameList() {
-    return nameList;
-}
-public void setNameList(List&lt;String&gt; nameList) {
-    this.nameList = nameList;
-}
-public Set&lt;String&gt; getNameSet() {
-    return nameSet;
-}
-public void setNameSet(Set&lt;String&gt; nameSet) {
-    this.nameSet = nameSet;
-}
-public Map&lt;String, String&gt; getNameMap() {
-    return nameMap;
-}
-public void setNameMap(Map&lt;String, String&gt; nameMap) {
-    this.nameMap = nameMap;
-}
-public Properties getNameProp() {
-    return nameProp;
-}
-public void setNameProp(Properties nameProp) {
-    this.nameProp = nameProp;
-}
-
-
-}
-
-
-package sirk_spring_tuto.demo;
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-public class CollectionsMain {
-
-public static void main(String[] args) {
-    ApplicationContext ctx = new ClassPathXmlApplicationContext(&#34;CollectionBeans.xml&#34;);
-    CollectionsDemo collectionsDemo = (CollectionsDemo) ctx.getBean(&#34;collectionsDemo&#34;);
-    System.out.println(collectionsDemo.getNameList());
-    System.out.println(collectionsDemo.getNameSet());
-    System.out.println(collectionsDemo.getNameMap());
-    System.out.println(collectionsDemo.getNameProp());
-
-}
-
-}
-
-
-&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
-&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
-xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
-xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd&#34;&gt;
-
-&lt;bean id=&#34;collectionsDemo&#34; class=&#34;sirk_spring_tuto.demo.CollectionsDemo&#34;&gt;
-    &lt;property name=&#34;nameList&#34;&gt;
-        &lt;list&gt;
-            &lt;value&gt;hello&lt;/value&gt;
-            &lt;value&gt;sirk&lt;/value&gt;
-            &lt;value&gt;hello&lt;/value&gt;                
-        &lt;/list&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&#34;nameSet&#34;&gt;
-        &lt;set&gt;
-            &lt;value&gt;hello&lt;/value&gt;
-            &lt;value&gt;sirk&lt;/value&gt;
-            &lt;value&gt;hello&lt;/value&gt;
-        &lt;/set&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&#34;nameMap&#34;&gt;
-        &lt;map&gt;
-            &lt;entry key=&#34;hello&#34; value=&#34;sirk&#34;/&gt;
-            &lt;entry key=&#34;good&#34; value=&#34;day&#34;/&gt;
-        &lt;/map&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&#34;nameProp&#34;&gt;
-        &lt;props&gt;
-            &lt;prop key=&#34;one&#34;&gt;hello&lt;/prop&gt;
-            &lt;prop key=&#34;two&#34;&gt;world&lt;/prop&gt;
-        &lt;/props&gt;
-    &lt;/property&gt;
-
-&lt;/bean&gt;
-
-&lt;/beans&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;最后执行打印如下结果：&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;[hello, sirk, hello]
-[hello, sirk]
-{hello=sirk, good=day}
-{two=world, one=hello}
-&lt;/pre&gt;
-
-&lt;h2&gt;注入Bean的引用&lt;/h2&gt;
-
-&lt;p&gt;前一个例子中放入集合中的元素都是值元素，如果要放入其它bean的引用，可以配置配置文件如下：&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
-&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
-xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
-xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd&#34;&gt;
-
-&lt;bean id=&#34;collectionsDemo&#34; class=&#34;sirk_spring_tuto.demo.CollectionsDemo&#34;&gt;
-    &lt;property name=&#34;nameList&#34;&gt;
-        &lt;list&gt;
-            &lt;ref bean=&#34;XXX&#34;/&gt;
-            &lt;value&gt;hello&lt;/value&gt;
-            &lt;value&gt;sirk&lt;/value&gt;
-            &lt;value&gt;hello&lt;/value&gt;                
-        &lt;/list&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&#34;nameSet&#34;&gt;
-        &lt;set&gt;
-            &lt;ref bean=&#34;XXX&#34;/&gt;
-            &lt;value&gt;hello&lt;/value&gt;
-            &lt;value&gt;sirk&lt;/value&gt;
-            &lt;value&gt;hello&lt;/value&gt;
-        &lt;/set&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&#34;nameMap&#34;&gt;
-        &lt;map&gt;
-            &lt;entry key=&#34;hello&#34; value=&#34;sirk&#34;/&gt;
-            &lt;entry key=&#34;good&#34; value=&#34;day&#34;/&gt;
-            &lt;entry key=&#34;YYY&#34; value-ref=&#34;XXX&#34;&gt;&lt;/entry&gt;
-        &lt;/map&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&#34;nameProp&#34;&gt;
-        &lt;props&gt;
-            &lt;prop key=&#34;one&#34;&gt;hello&lt;/prop&gt;
-            &lt;prop key=&#34;two&#34;&gt;world&lt;/prop&gt;
-        &lt;/props&gt;
-    &lt;/property&gt;
-
-&lt;/bean&gt;
-
-&lt;/beans&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;这配置其实混合使用了值类型和引用类型，请注意那些带有ref的标签元素。就是对于引用类型的用法。&lt;/p&gt;
-
-&lt;h2&gt;注入null和空字符串&lt;/h2&gt;
-
-&lt;p&gt;最后再来看看如何注入null和空字符串：&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;如果想注入null，请看下面配置&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;bean id=&#34;...&#34; class=&#34;exampleBean&#34;&gt;
-    &lt;property name=&#34;telephone&#34;&gt;&lt;null/&gt;&lt;/property&gt;
-&lt;/bean&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;这好比调用了exampleBean.setTelephone(null)&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;如果想注入空字符串，看下面配置：&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;bean id=&#34;...&#34; class=&#34;exampleBean&#34;&gt;
-     &lt;property name=&#34;telephone&#34; value=&#34;&#34;/&gt;
-&lt;/bean&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;该配置好比调用了exmapleBean.setTelephone(“”)&lt;/p&gt;
-
-&lt;h2&gt;小结&lt;/h2&gt;
-
-&lt;p&gt;本文介绍了spring对于集合的注入，下篇更精彩，敬请期待~&lt;/p&gt;
-
-&lt;p&gt;##文档信息&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/4/7/spring-injecting-collection.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;4&lt;/sub&gt;/7/spring-injecting-collection.html&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
 &lt;/ul&gt;
 </description>

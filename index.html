@@ -77,6 +77,48 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/articles/2015/2/7/learn-ios-dev-faster-oc-1.html">快速学习ios开发：Objective-C基础(一)</a></h1>
+    
+      <p class="meta">
+<time data-updated="true" pubdate="" datetime="2014-04-24T21:58:00+08:00">Feb 7, 2015</time>
+        	
+         | <a href="/articles/2015/2/7/learn-ios-dev-faster-oc-1.html#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+  <div class="entry-content">
+	零、关于快速学习ios开发系列文章
+
+为什么会要写这个系列？
+
+这是个好问题，其实我也不知道这个系列是否会和其他系列一样写着写着就搁置好多了，然后不知道什么时候才更新。但是无所谓，因为本来就是主要用来记录个人学习过程的，如果在这过程中能够帮助到别人也算是一件不错的事情。所以不要太期望文章一定会及时或者持续更新下去，就比如博客中其他文章一样，因为很多也只是记录个人学习历程，如果某个技术在实际工作或者学习中不需要继续深究下去了，可能就不会及时持续更新了，因为要忙的事情实在太多，当然，如果有时间的话，我还是非常希望能把未完结的所有系列文章都给来个大结局。这不，最近入手了Mac，当然得学习学习ios了。如果你也是新手，可以跟着一起玩玩。
+
+一、需要准备的
+
+
+一台Mac
+Mac里装个Xcode，这里版本是6.1.1
+一只会编程的猴子
+
+
+上述三个条件，前面两个应该都比较好搞定，第三个需要一个会编程的猴子，这个条件就比较特殊了，因为每只猴子的基础都不一样啊，什么？你不知道猴子是什么？那估计你不需要往下看了。当然猴子的基础越好，就越能掌握本系列的精髓－快速。所以，在学习过程中绝对不是那种《xxx入门》什么类型的，会花很多时间先来学学oc语言语法，然后一步一步截图展示如何创建一个hello world。所以做好准备，可能在学习过程中，你会需要另外去查阅资料。
+
+二、从xxx语言到Objective-C
+
+在ios开发中现在可以使用Objective-C或者是Swift开发语言。这里学习为什么不选Swift呢？虽然她比较新，而且相信未来发展也是非常不错的，但是目前第三方支持或者一些坑可能都没有前人踩过，所以还是选择稳定且但比较旧的Objective-C。当然，对于像笔者这样喜欢尝试各种语言的，到时候切换Swift也说不会有任何困难的。所以，这个标题也就变成了xxx语言到Objective-C了，因为笔者并不是从某一种语言转来的，而是一堆。所以我会在不同语言角度来看Objective-C的语法来对比，当然还是会选择一些比较常用的语言。
+所以如果你还没有学过其他编程语言，可能就比较惨了，因为快速入门是建立在之前基础
+ </div>
+    <footer>
+      <a href="/articles/2015/2/7/learn-ios-dev-faster-oc-1.html" rel="full-article">阅读更多 →</a>
+    </footer>
+  
+    </article>
+  
+ <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a></h1>
     
       <p class="meta">
@@ -834,62 +876,6 @@ vi hadoop-common-project/hadoop-auth/pom.xml
   
     </article>
   
- <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/articles/2014/3/4/tesseract-ocr-use.html">linux下安装图片识别引擎tesseract-ocr</a></h1>
-    
-      <p class="meta">
-<time data-updated="true" pubdate="" datetime="2014-04-24T21:58:00+08:00">Mar 4, 2014</time>
-        	
-         | <a href="/articles/2014/3/4/tesseract-ocr-use.html#duoshuo_thread">评论</a>
-        
-      </p>
-    
-  </header>
-  <div class="entry-content">
-	一、关于tesseract-ocr
-
-tesseract-ocr是一个开源的图片识别引擎，可以用它来处理识别验证码图片等，并且支持多种语言，特别棒的是还提供了训练功能，通过训练生成的训练样本，能大大提高识别率。更多的资料可以参考官网:https://code.google.com/p/tesseract-ocr/
-
-二、安装环境
-
-在windows平台下，官网直接有安装包下载，所以这里主要了介绍如何在Linux平台下编译安装。笔者使用Centos操作系统来实验，其它系统应该类似。
-
-三、安装过程
-
-因为需要编译源码，所以首先安装编译环境：
-&gt; 编译环境: gcc gcc-c&#43;&#43; make
-
-yum install gcc gcc-c&#43;&#43; make
-
-
-接下来还需要autoconf automake libtool libjpeg-devel libpng-devel libtiff-devel zlib-devel这些库：
-
-yum install autoconf automake libtool
-yum install libjpeg-devel libpng-devel libtiff-devel zlib-devel
-
-
-
-(如果是ubuntu系统执行下面：
-
-
-sudo apt-get install libpng12-dev  
-sudo apt-get install libjpeg62-dev  
-sudo apt-get install libtiff4-dev  
-
-
-)
-
-另外tesseract-ocr还依赖leptonica，它同样需要通过源码编译，首先下载它：
- </div>
-    <footer>
-      <a href="/articles/2014/3/4/tesseract-ocr-use.html" rel="full-article">阅读更多 →</a>
-    </footer>
-  
-    </article>
-  
  
   
 </div>
@@ -911,6 +897,8 @@ sudo apt-get install libtiff4-dev
 	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
 
 	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#ios">ios</a></li>
 
 	<li><a href="/category.html#java">java</a></li>
 
@@ -935,6 +923,10 @@ sudo apt-get install libtiff4-dev
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/articles/2015/2/7/learn-ios-dev-faster-oc-1.html">快速学习ios开发：Objective-C基础(一)</a>
+      </li>
+    
+      <li class="post">
         <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
       </li>
     
@@ -952,10 +944,6 @@ sudo apt-get install libtiff4-dev
     
       <li class="post">
         <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
-      </li>
-    
-      <li class="post">
-        <a href="/articles/2014/5/29/http-server-push.html">java servlet简单实现http服务器推</a>
       </li>
     
   </ul>

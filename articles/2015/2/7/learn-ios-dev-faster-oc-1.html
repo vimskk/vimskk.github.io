@@ -1,0 +1,403 @@
+
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >   
+	<head>          
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
+	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
+	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
+	<meta name="author" content="卧雪Sirk"/>        
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+	<link rel="shortcut icon" href="/fav.ico"/>
+	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+	
+	</head>
+	<body onload="prettyPrint()">
+		
+
+
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  		<li><a href="/" class="on-sel">Index</a></li>
+		<li><a href="/tag.html">Tags</a></li>
+		<li><a href="/category.html">Categories</a></li>
+		<li><a href="/archive.html">Archive</a></li>
+		
+		<li><a href="/pages/about.html" target="_self">About</a></li>
+		
+		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+		
+	</ul>
+
+
+        <ul data-subscription="rss" class="nav pull-right">
+          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+          
+        </ul>
+
+        
+          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
+            <fieldset role="search">
+              <input type="hidden" value="site:www.cocosk.com" name="q">
+              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">快速学习ios开发：Objective-C基础(一)</h1>
+      <p class="meta">
+        
+<time data-updated="true" pubdate="" >Posted Feb 7, 2015 </time>
+        
+		
+         | <a href="#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<h2>零、关于快速学习ios开发系列文章</h2>
+
+<p>为什么会要写这个系列？</p>
+
+<p>这是个好问题，其实我也不知道这个系列是否会和其他系列一样写着写着就搁置好多了，然后不知道什么时候才更新。但是无所谓，因为本来就是主要用来记录个人学习过程的，如果在这过程中能够帮助到别人也算是一件不错的事情。所以不要太期望文章一定会及时或者持续更新下去，就比如博客中其他文章一样，因为很多也只是记录个人学习历程，如果某个技术在实际工作或者学习中不需要继续深究下去了，可能就不会及时持续更新了，因为要忙的事情实在太多，当然，如果有时间的话，我还是非常希望能把未完结的所有系列文章都给来个大结局。这不，最近入手了Mac，当然得学习学习ios了。如果你也是新手，可以跟着一起玩玩。</p>
+
+<h2>一、需要准备的</h2>
+
+<ul>
+<li>一台Mac</li>
+<li>Mac里装个Xcode，这里版本是6.1.1</li>
+<li>一只会编程的猴子</li>
+</ul>
+
+<p>上述三个条件，前面两个应该都比较好搞定，第三个需要一个会编程的猴子，这个条件就比较特殊了，因为每只猴子的基础都不一样啊，什么？你不知道猴子是什么？那估计你不需要往下看了。当然猴子的基础越好，就越能掌握本系列的精髓－快速。所以，在学习过程中绝对不是那种《xxx入门》什么类型的，会花很多时间先来学学oc语言语法，然后一步一步截图展示如何创建一个hello world。所以做好准备，可能在学习过程中，你会需要另外去查阅资料。</p>
+
+<h2>二、从xxx语言到Objective-C</h2>
+
+<p>在ios开发中现在可以使用Objective-C或者是Swift开发语言。这里学习为什么不选Swift呢？虽然她比较新，而且相信未来发展也是非常不错的，但是目前第三方支持或者一些坑可能都没有前人踩过，所以还是选择稳定且但比较旧的Objective-C。当然，对于像笔者这样喜欢尝试各种语言的，到时候切换Swift也说不会有任何困难的。所以，这个标题也就变成了xxx语言到Objective-C了，因为笔者并不是从某一种语言转来的，而是一堆。所以我会在不同语言角度来看Objective-C的语法来对比，当然还是会选择一些比较常用的语言。
+所以如果你还没有学过其他编程语言，可能就比较惨了，因为快速入门是建立在之前基础上的，建议还是乖乖的先学习一门语言并熟练运用再回来，不然看了也说浪费时间。</p>
+
+<h2>三、快速浏览Objective-C</h2>
+
+<p>既然要快速学，那我们肯定不是去拿本Objective-C的基本语法书从Hello World开始学起，于是我们就站在已经学会的角度去学，听起来有点怪怪的。首先我们来回答个问题，为什么学Objective-C？很明显，我们要拿它来写ios的应用或者游戏，于是，我们就清楚我们要做的了。当然说赶紧的打开Xcode，创建第一个项目。如下图：</p>
+
+<p><a href="/assets/themes/sk/pic/ios1-1.png"><img src="/assets/themes/sk/pic/ios1-1.png" alt="" />
+</a></p>
+
+<p><a href="/assets/themes/sk/pic/ios1-2.png"><img src="/assets/themes/sk/pic/ios1-2.png" alt="" />
+</a></p>
+
+<p>按照上创建FirstApp，并设置项目名称等信息，然后可以就可以看下项目的结构了:</p>
+
+<p><a href="/assets/themes/sk/pic/ios1-3.png"><img src="/assets/themes/sk/pic/ios1-3.png" alt="" />
+</a></p>
+
+<p>于是我们从目录结构来猜猜看，马上发现有个main.m的文件，学过C语言的应该有点印象，莫非它也是oc的入口函数，二话不说，打开之：</p>
+
+<pre class="prettyprint linenums">#import &lt;UIKit/UIKit.h&gt;
+#import &#34;AppDelegate.h&#34;
+
+int main(int argc, char * argv[]) {
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
+}
+</pre>
+
+<p>好家伙，连main函数参数都和C语言的一样。那来找找不一样的呢，发现开头是#import而不是#include,他们具体异同点如下：</p>
+
+<ul>
+<li>#import是一个预处理指令，作用跟C语言的#include类似，包含某个文件的内容到预处理指令所在的位置。</li>
+
+<li><p>在C\C++中，我们用#include来包含头文件，但是同一个头文件可能被包含多次。为了解决这个问题，一般我们会这么写：</p>
+
+<p>#ifndef <em>APP_H</em>
+#define <em>APP_H</em></p>
+
+<p>/<em>…..</em>/</p>
+
+<p>#endif</p></li>
+
+<li><p>使用#import来包含头文件，可以自动防止同一个头文件被包含多次。</p></li>
+
+<li><p>#import <xxx>表示包含系统自带的文件，#import “xxx”表示包含开发人员自己创建的文件</p></li>
+</ul>
+
+<p>我们再来看main函数体的内容，发现有个@autoreleasepool，这个是什么东西？写过Java的都应该知道Java的垃圾回收机制，但是OC是不支持垃圾回收的，需要开发人员编写代码来释放对象所占用的内存。这个东西就是OC内存管理的一种东西－自动释放池，使用这个东西就可以方便开发人员不再需要每次手动的retain和release对象，这部分涉及到内存管理比较深入的东西了，暂且不深入了解，后续再说。</p>
+
+<h2>四、UIApplicationMain</h2>
+
+<p>我们打开UIApplicationMain的定义</p>
+
+<pre class="prettyprint linenums">UIKIT_EXTERN int UIApplicationMain(int argc, char *argv[], NSString *principalClassName, NSString *delegateClassName);
+</pre>
+
+<p>嗯，看起来像是一个函数，但是前面有个UIKIT_EXTERN，继续查看源码：</p>
+
+<pre class="prettyprint linenums">#import &lt;Availability.h&gt;
+
+#ifdef __cplusplus
+#define UIKIT_EXTERN        extern &#34;C&#34; __attribute__((visibility (&#34;default&#34;)))
+#else
+#define UIKIT_EXTERN            extern __attribute__((visibility (&#34;default&#34;)))
+#endif
+
+#define UIKIT_STATIC_INLINE     static inline
+</pre>
+
+<p>原来是一个宏定义，其中<strong>cplusplus是cpp中的自定义宏，如果这是一段cpp的代码，那么加入extern”C”和其中的代码。extern是C/C++语言中表明函数和全局变量作用范围（可见性）的关键字，该关键字告诉编译器，其声明的函数和变量可以在本模块或其它模块中使用。C++之父在设计C++之时，考虑到当时已经存在了大量的C代码，为了支持原来的C代码和已经写好C库，需要在C++中尽可能的支持C，而 extern “C”就是其中的一个策略。</strong>attribute<strong>是GNU C的一种机制，用法为_attribute</strong> ((attribute-list))。当项目需要作为一个库被外包引用的时候通常在编译时可以用参数-fvisibility指定所有符号的可见性。在编译命令中加入 -fvisibility=hidden参数，会将所有默认的public的属性变为hidden。此时，如果对函数设置<strong>attribute</strong>((visibility (“default”)))参数，使特定的函数仍然按默认的public属性处理，则-fvisibility=hidden参数不会对该函数起作用。所以，设置了-fvisibility=hidden参数之后，只有设置了<strong>attribute</strong>((visibility (“default”)))的函数才是对外可见的。</p>
+
+<p>上面讲了一大堆，总之呢，就是UIApplicationMain是界面相关的UIKit框架对外可见的一个函数。</p>
+
+<p>再来看看UIApplicationMain函数，它接收四个参数,其中argc和argv是main函数传过来的，该函数还需要两个字符串参数，用于标识应用程序的首要类（即应用程序对象所属的类）和应用程序委托类。果首要类字符串的值为nil, UIKit就缺省使用UIApplication类；如果应用程序委托类为nil，UIKit就会将应用程序主nib文件（针对通过Xcode模板创建的应用程序）中的某个对象假定为应用程序的委托对象。在这个例子中,应用程序委托类不是nil的，从之前的函数参数类型和参数名称来看，是自定义一个字符串类型的代理类名，但是是这样的：</p>
+
+<pre class="prettyprint linenums">NSStringFromClass([AppDelegate class])
+</pre>
+
+<p>打开NSStringFromClass定义看到：</p>
+
+<pre class="prettyprint linenums">FOUNDATION_EXPORT NSString *NSStringFromClass(Class aClass);
+</pre>
+
+<p>这是FOUNDATION框架中提供的一个底层对外可见的函数，看意思应该是获取一个Class的名称。至于FOUNDATION和UIKIT框架，这里先不详细介绍了，后面准备讲整个ios开发框架架构时候再说。那么里面这个</p>
+
+<pre class="prettyprint linenums">[AppDelegate class]
+</pre>
+
+<p>是什么意思？这是OC中方法调用的一种语法，其实OC调用方法是使用“消息结构”（messaging structure）而非C++等语言的“函数调用”（function calling)，关键区别在于：使用消息结构的语言，其运行时所应执行的代码由运行环境来决定；而使用函数调用的语言，则由编译器决定。因此，OC是相当动态的，当调用一个实例的方法，在runtime时向该实例的指针发送消息，实例在收到消息后，从自身的实现中寻找响应这条消息的方法。基本语法如下：</p>
+
+<pre class="prettyprint linenums">[实例 方法]; 
+</pre>
+
+<p>or</p>
+
+<pre class="prettyprint linenums">[类名 方法名];
+</pre>
+
+<p>前面讲过调用一个类或实例的方法，实际上是给这个类或实例发消息（message）。类或实例称为“接收方”。所以，调用方法的格式也可以理解为：</p>
+
+<pre class="prettyprint linenums">[接收方 消息];
+</pre>
+
+<p>在术语上，整个表达式也叫消息表达式。如果有返回值，那么如下：</p>
+
+<pre class="prettyprint linenums">变量＝[接收方 消息];
+</pre>
+
+<p>如果要传递参数呢：</p>
+
+<pre class="prettyprint linenums">[Dog setName:“tom”];
+</pre>
+
+<p>当然如果有多个参数：</p>
+
+<pre class="prettyprint linenums">[接收方 名字1:参数1 名字2:参数2, 名字3:参数3 .. ];
+</pre>
+
+<p>为了避免声明过多的本地变量保存临时结果，Objective-C允许你使用嵌套消息。每个嵌套消息的返回值可以作为其他消息的参数或者目标。如下：</p>
+
+<pre class="prettyprint linenums">[NSString stringWithFormat:[dog getName]];
+</pre>
+
+<p>虽然这样很方便，但是为了更好的代码可读性，建议避免在一行代码中嵌套调用超过两个方法。</p>
+
+<p>介绍了那么多关于关于消息传递的知识，现在终于可以理解</p>
+
+<pre class="prettyprint linenums">[AppDelegate class]
+</pre>
+
+<p>其实意思就是向AppDelegate类发了class消息，那么这个消息（可以理解为一个方法调用）是什么呢？我们继续找到class的定义：</p>
+
+<pre class="prettyprint linenums">+ (Class)class;
+</pre>
+
+<p>在NSObject.h文件中找到了如上的声明，有点类似c++中头文件中方法的声明。此处又出现奇怪的＋号，这个又是什么呢？请听下回分解。</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2015/2/7/learn-ios-dev-faster-oc-1.html">http://www.cocosk.com/articles/<sup>2015</sup>⁄<sub>2</sub>/7/learn-ios-dev-faster-oc-1.html</a></li>
+<li>作者：Sirk</li>
+</ul>
+
+</div>
+
+  <footer>
+    <p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2015-02-07 22:33:10</time>
+      
+
+<span class="categories">
+  
+</span>
+</p>
+
+   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+    <section>
+      
+        <div class="" id="duoshuo_thread" aria-live="polite">
+        <div id="ds-thread" class="ds-thread"></div></div><br/>
+        
+       
+ 
+</section>    
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section>
+  <h2>公告</h2>
+  <p>萬物靜觀皆自得,四時佳興與人同</p>
+  <p></p>
+</section>
+<section>
+  <h2>分类目录</h2>
+    <ul id="category-list">
+
+	<li><a href="/category.html#algorithms">algorithms</a></li>
+
+	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#hadoop">hadoop</a></li>
+
+	<li><a href="/category.html#ios">ios</a></li>
+
+	<li><a href="/category.html#java">java</a></li>
+
+	<li><a href="/category.html#javascript">javascript</a></li>
+
+	<li><a href="/category.html#jvm">jvm</a></li>
+
+	<li><a href="/category.html#nginx">nginx</a></li>
+
+	<li><a href="/category.html#spring">spring</a></li>
+
+	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+    </ul>
+</section>
+
+
+<section>
+  <h2>最新文章</h2>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/articles/2015/2/7/learn-ios-dev-faster-oc-1.html">快速学习ios开发：Objective-C基础(一)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
+      </li>
+    
+      <li class="post">
+        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>友情链接</h2>
+  <ul>
+    <li>
+      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+ 
+        <script type="text/javascript">  
+        var duoshuoQuery = {short_name:"cocosk"};  
+        (function() {    
+        var ds = document.createElement('script');    
+        ds.type = 'text/javascript';
+        ds.async = true;    
+        ds.src = 'http://static.duoshuo.com/embed.js';    
+        ds.charset = 'UTF-8';    
+        (document.getElementsByTagName('head')[0]||
+        document.getElementsByTagName('body')[0]).appendChild(ds); 
+        })(); 
+ </script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+ </script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+
