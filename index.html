@@ -77,6 +77,45 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/articles/2015/2/17/docker-pull-image-error.html">docker pull 私有仓库镜像出错的问题</a></h1>
+    
+      <p class="meta">
+<time data-updated="true" pubdate="" datetime="2014-04-24T21:58:00+08:00">Feb 17, 2015</time>
+        	
+         | <a href="/articles/2015/2/17/docker-pull-image-error.html#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+  <div class="entry-content">
+	问题描述
+
+通过docker pull命令来pull私有仓库image出现报错：
+
+FATA[0010] Error: v1 ping attempt failed with error: Get https://111.xx.xx.xx/v1/_ping: dial tcp 111.xx.xx.xx:443: i/o timeout. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add --insecure-registry 111.xx.xx.xx to the daemon’s arguments. In the case of HTTPS, if you have access to the registry’s CA certificate, no need for the flag; simply place the CA certificate at /etc/docker/certs.d/111.xx.xx.xx/ca.crt
+
+根据错误提示，是CA的问题，我们需要在docker的启动参数加上-insecure-registry 111.xx.xx.xx，所以我们需要在vi /etc/default/docker,加上
+
+DOCKER_OPTS=&#34;$DOCKER_OPTS --insecure-registry=111.xx.xx.xx&#34;
+
+
+然后重启Docker
+
+sudo service docker restart
+
+
+但是，如果你是在OS X系统下使用boot2docker的，那么通过boot2docker ssh 进入到虚拟机，操作上述方法是不行的，当然有其他办法，那就是ssh到boot2docker虚拟机，然后修改vi /var/lib/boot2do
+ </div>
+    <footer>
+      <a href="/articles/2015/2/17/docker-pull-image-error.html" rel="full-article">阅读更多 →</a>
+    </footer>
+  
+    </article>
+  
+ <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/articles/2015/2/7/learn-ios-dev-faster-oc-1.html">快速学习ios开发：Objective-C基础(一)</a></h1>
     
       <p class="meta">
@@ -818,64 +857,6 @@ pu
   
     </article>
   
- <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/articles/2014/4/1/hadoop-build-errors.html">hadoop2.0.0编译遇到的错误</a></h1>
-    
-      <p class="meta">
-<time data-updated="true" pubdate="" datetime="2014-04-24T21:58:00+08:00">Apr 1, 2014</time>
-        	
-         | <a href="/articles/2014/4/1/hadoop-build-errors.html#duoshuo_thread">评论</a>
-        
-      </p>
-    
-  </header>
-  <div class="entry-content">
-	前言
-
-由于hadoop2.2.0官方未提供64位的可执行版本，所以只能通过下载源代码自己进行编译，本文以这几天笔者实际编译过程中遇到的错误（不保证一定会遇到）作为记录参考。
-
-编译运行环境
-
-
-ubuntu 64位
-
-
-遇到的错误
-
-
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:2.5.1:testCompile (default-testCompile) on project hadoop-auth: Compilation failure: Compilation failure:
-[ERROR] /Users/JuneMAC/hadoop/release-2.2.0/hadoop-common-project/hadoop-auth/src/test/java/org/apache/hadoop/security/authentication/client/AuthenticatorTestCase.java:[88,11] 错误: 无法访问AbstractLifeCycle
-
-
-解决方案:
-
-vi hadoop-common-project/hadoop-auth/pom.xml
-
-
-在
-
- 
-      org.mortbay.jetty
-      jetty
-      test
- 
-
-
-前面加上
-
- 
-      org.mortbay.jetty
-      
- </div>
-    <footer>
-      <a href="/articles/2014/4/1/hadoop-build-errors.html" rel="full-article">阅读更多 →</a>
-    </footer>
-  
-    </article>
-  
  
   
 </div>
@@ -895,6 +876,8 @@ vi hadoop-common-project/hadoop-auth/pom.xml
 	<li><a href="/category.html#algorithms">algorithms</a></li>
 
 	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+	<li><a href="/category.html#docker">docker</a></li>
 
 	<li><a href="/category.html#hadoop">hadoop</a></li>
 
@@ -923,6 +906,10 @@ vi hadoop-common-project/hadoop-auth/pom.xml
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/articles/2015/2/17/docker-pull-image-error.html">docker pull 私有仓库镜像出错的问题</a>
+      </li>
+    
+      <li class="post">
         <a href="/articles/2015/2/7/learn-ios-dev-faster-oc-1.html">快速学习ios开发：Objective-C基础(一)</a>
       </li>
     
@@ -940,10 +927,6 @@ vi hadoop-common-project/hadoop-auth/pom.xml
     
       <li class="post">
         <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
-      </li>
-    
-      <li class="post">
-        <a href="/articles/2014/6/15/cocos2d-x-3-physicals.html">cocos2d-x 3.0学习-使用Physicals创建物理世界</a>
       </li>
     
   </ul>

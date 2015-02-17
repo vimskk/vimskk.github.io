@@ -4,8 +4,53 @@
         <title>RSS 订阅酷酷时空</title>
         <link>cocosk.com</link>
         <description>RSS 酷酷时空</description>
-        <lastBuildDate>Sat, 07 Feb 2015 22:28:58 CST</lastBuildDate>
+        <lastBuildDate>Tue, 17 Feb 2015 11:35:05 CST</lastBuildDate>
         <language>zh-cn</language>
+       
+        <item>
+            <title>docker pull 私有仓库镜像出错的问题</title>
+            <link>2015/2/17/docker-pull-image-error.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2015-02-17 11:52:00</pubDate>
+            <description>&lt;h2&gt;问题描述&lt;/h2&gt;
+
+&lt;p&gt;通过docker pull命令来pull私有仓库image出现报错：&lt;/p&gt;
+
+&lt;p&gt;FATA[0010] Error: v1 ping attempt failed with error: Get &lt;a href=&#34;https://111.xx.xx.xx/v1/_ping:&#34;&gt;https://111.xx.xx.xx/v1/_ping:&lt;/a&gt; dial tcp 111.xx.xx.xx:443: i/o timeout. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add &lt;code&gt;--insecure-registry 111.xx.xx.xx&lt;/code&gt; to the daemon’s arguments. In the case of HTTPS, if you have access to the registry’s CA certificate, no need for the flag; simply place the CA certificate at /etc/docker/certs.d/111.xx.xx.xx/ca.crt&lt;/p&gt;
+
+&lt;p&gt;根据错误提示，是CA的问题，我们需要在docker的启动参数加上-insecure-registry 111.xx.xx.xx，所以我们需要在vi /etc/default/docker,加上&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;DOCKER_OPTS=&#34;$DOCKER_OPTS --insecure-registry=111.xx.xx.xx&#34;
+&lt;/pre&gt;
+
+&lt;p&gt;然后重启Docker&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;sudo service docker restart
+&lt;/pre&gt;
+
+&lt;p&gt;但是，如果你是在OS X系统下使用boot2docker的，那么通过boot2docker ssh 进入到虚拟机，操作上述方法是不行的，当然有其他办法，那就是ssh到boot2docker虚拟机，然后修改vi /var/lib/boot2docker/profile 加入&lt;/p&gt;
+
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;EXTRA_ARGS=&#34;--insecure-registry=111.xx.xx.xx&#34;
+&lt;/pre&gt;
+
+&lt;p&gt;然后退出虚拟机,执行重启：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;boot2docker down&lt;/li&gt;
+&lt;li&gt;boot2docker up&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;然后就可以从111.xx.xx.xx的私有仓库pull images了。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2015/2/17/docker-pull-image-error.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2015&lt;/sup&gt;⁄&lt;sub&gt;2&lt;/sub&gt;/17/docker-pull-image-error.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
        
         <item>
             <title>快速学习ios开发：Objective-C基础(一)</title>
@@ -1218,85 +1263,6 @@ public void setRc(RemoteControl rc) {
 &lt;ul&gt;
 &lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/4/26/spring-annotation-configuration.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;4&lt;/sub&gt;/26/spring-annotation-configuration.html&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        </item>
-       
-        <item>
-            <title>spring新手攻略（12）-自动装配(Autowire)</title>
-            <link>2014/4/13/spring-autowire.html</link>
-            <author>卧雪Sirk</author>
-            <pubDate>2014-04-13 11:52:00</pubDate>
-            <description>&lt;h2&gt;前言&lt;/h2&gt;
-
-&lt;p&gt;今天，主要介绍下spring的自动装配特性。看了之前的文章，我们已经看到依赖注入的强大之处，但是你会发现当一个bean依赖另一个bean的时候，你需要在xml配置文件中定义如下的元素引用：&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34;&gt;
-&lt;property name=&#34;screen&#34; ref=&#34;screen&#34;&gt;&lt;/property&gt; 
-&lt;/bean&gt;
-&lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;上述代码中，id为tv的bean注入了id为screen的bean，而且是通过setter注入的，所以必须在id为tv的bean中添加&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;property name=&#34;screen&#34; ref=&#34;screen&#34;&gt;&lt;/property&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;如果还有其他的属性需要注入，也是需要依次添加上述的标签定义的。试想一下，如果你有很多bean，并且很多需要注入的依赖属性，那么你的xml配置文件将会变得非常庞大。为了解决这个问题，spring提供了一个自动装配的特性，它可以自动搜集bean，并且将依赖自动装配装配到需要的bean中去。&lt;/p&gt;
-
-&lt;h2&gt;spring自动装配的几种类型&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;byName 通过属性名称进行自动装配。spring容器通过查找在xml配置文件中autowire属性被设置为byName的bean。然后它会去试着匹配配置文件中其它bean,如果那个bean名称和需要注入的属性名称一样，就进行装配。&lt;/li&gt;
-&lt;li&gt;byType 通过属性数据类型进行自动装配。与上述byName类似，不过进行匹配的时候是根据数据类型进行匹配。&lt;/li&gt;
-&lt;li&gt;constructor 和byType类似，不过类型是根据构造方法的类型进行匹配。&lt;/li&gt;
-&lt;li&gt;autodetect 首先尝试通过构造方法进行装配，如果不成功，则通过byType进行自动装配。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;一个根据byName自动装配的例子&lt;/h2&gt;
-
-&lt;p&gt;这里我们引用&lt;a href=&#34;http://cocosk.com/articles/2014/4/4/spring-dependency-injection-2.html&#34;&gt;spring新手攻略（9）-依赖注入(二)(Dependency Injection)&lt;/a&gt;的例子，java代码部分不变。只修改xml配置文件。&lt;/p&gt;
-
-&lt;p&gt;之前的xml配置文件：&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34;&gt;
-&lt;property name=&#34;screen&#34; ref=&#34;screen&#34;&gt;&lt;/property&gt; 
-&lt;/bean&gt;
-&lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;通过byName自动装配:&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34; autowire=&#34;byName&#34;&gt;
-&lt;!-- &lt;property name=&#34;screen&#34; ref=&#34;screen&#34;&gt;&lt;/property&gt;  --&gt;
-&lt;/bean&gt;
-&lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;上面我们注释掉了property的定义，但是可以正常执行。&lt;/p&gt;
-
-&lt;h2&gt;根据byType和constructor进行自动装配&lt;/h2&gt;
-
-&lt;p&gt;byType类似。只需要将autowire属性的值换成byType。constructor,只需要将autowire属性的值换成constructor。并且在id为tv的Class类TV中需要定义一个构造方法来进行通过构造方法注入。&lt;/p&gt;
-
-&lt;h2&gt;几个关于自动装配需要注意的地方&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;声明了自动装配属性后，还是可以显示的通过property等进行设置进行装配，并且这些设置会覆盖自动装配。&lt;/li&gt;
-&lt;li&gt;无法自动装配原始数据类型，Strings和Classes类型。&lt;/li&gt;
-&lt;li&gt;自动装配与手动装配相比不够精确，所以在允许情况下尽可能使用手动装配。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;小结&lt;/h2&gt;
-
-&lt;p&gt;介绍了spring中的几种自动装配方式，下文将介绍基于注解的配置。&lt;/p&gt;
-
-&lt;p&gt;##文档信息&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/4/13/spring-autowire.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;4&lt;/sub&gt;/13/spring-autowire.html&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
 &lt;/ul&gt;
 </description>

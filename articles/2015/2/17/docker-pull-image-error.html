@@ -77,10 +77,10 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">nginx编译安装使用 </h1>
+      <h1 class="entry-title">docker pull 私有仓库镜像出错的问题</h1>
       <p class="meta">
         
-<time data-updated="true" pubdate="" >Posted Feb 6, 2014 </time>
+<time data-updated="true" pubdate="" >Posted Feb 17, 2015 </time>
         
 		
          | <a href="#duoshuo_thread">评论</a>
@@ -91,114 +91,41 @@
 
 
 <div class="entry-content">
-<h2>前言</h2>
+<h2>问题描述</h2>
 
-<p>之前博客一直使用自己基于Go语言开发的gosk的一个内置简单的静态服务应用来运行的，本来想逐步完善这个内置服务器，但是似乎还有很长路要走。之前一直听说nginx非常出色，于是打算把博客迁移放到nginx下来运行，今天就来完成迁移吧。要安装使用nginx有两种方式:
-* 直接使用安装包安装
-* 通过源码自行编译安装
-这里，我选择第二种方式，也就是通过源码编译。为什么？很简单，因为如果知道如何通过源码安装后，对于直接使用安装包安装肯定是没问题的，再说对于开源的好东西，不编译下源码有点对不住作者啊。接下来就以本站为例，来展示如何编译nginx并安装使用。</p>
+<p>通过docker pull命令来pull私有仓库image出现报错：</p>
 
-<h2>编译运行环境</h2>
+<p>FATA[0010] Error: v1 ping attempt failed with error: Get <a href="https://111.xx.xx.xx/v1/_ping:">https://111.xx.xx.xx/v1/_ping:</a> dial tcp 111.xx.xx.xx:443: i/o timeout. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add <code>--insecure-registry 111.xx.xx.xx</code> to the daemon’s arguments. In the case of HTTPS, if you have access to the registry’s CA certificate, no need for the flag; simply place the CA certificate at /etc/docker/certs.d/111.xx.xx.xx/ca.crt</p>
+
+<p>根据错误提示，是CA的问题，我们需要在docker的启动参数加上-insecure-registry 111.xx.xx.xx，所以我们需要在vi /etc/default/docker,加上</p>
+
+<pre class="prettyprint linenums">DOCKER_OPTS=&#34;$DOCKER_OPTS --insecure-registry=111.xx.xx.xx&#34;
+</pre>
+
+<p>然后重启Docker</p>
+
+<pre class="prettyprint linenums">sudo service docker restart
+</pre>
+
+<p>但是，如果你是在OS X系统下使用boot2docker的，那么通过boot2docker ssh 进入到虚拟机，操作上述方法是不行的，当然有其他办法，那就是ssh到boot2docker虚拟机，然后修改vi /var/lib/boot2docker/profile 加入</p>
+
+<pre class="prettyprint linenums">EXTRA_ARGS=&#34;--insecure-registry=111.xx.xx.xx&#34;
+</pre>
+
+<p>然后退出虚拟机,执行重启：</p>
 
 <ul>
-<li>centos 6.4</li>
+<li>boot2docker down</li>
+<li>boot2docker up</li>
 </ul>
 
-<h2>准备工作</h2>
-
-<p>安装编译需要用到的各种工具：</p>
-
-<h1>安装make</h1>
-
-<pre class="prettyprint linenums">yum -y install gcc automake autoconf libtool make
-</pre>
-
-<h1>安装g++</h1>
-
-<pre class="prettyprint linenums">yum install gcc gcc-c++
-</pre>
-
-<h2>下载相关依赖模块</h2>
-
-<ul>
-<li>pcre</li>
-<li>zlib</li>
-</ul>
-
-<p>上述两个模块是经常用到的模块，其中pcre是用来rewrite，zlib为了支持gzip压缩。
-我们先创建一个目录用来存放下载的模块：</p>
-
-<pre class="prettyprint linenums">mkdir apps
-</pre>
-
-<h1>接着我们下载安装pcre模块：</h1>
-
-<pre class="prettyprint linenums">cd /apps
-wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.34.tar.gz 
-tar -zxvf pcre-8.34.tar.gz
-cd pcre-8.34
-./configure --prefix=/apps/pcre
-make &amp;&amp; make install
-</pre>
-
-<h1>完成后安装zlib模块:</h1>
-
-<pre class="prettyprint linenums">wget http://zlib.net/zlib-1.2.8.tar.gz
-tar -zxvf zlib-1.2.8.tar.gz
-cd zlib-1.2.8
-./configure --prefix=/apps/zlib
-make &amp;&amp; make install
-</pre>
-
-<p>在上述编译过程中有可能出现make出错情况，可能是没有安装ssl：</p>
-
-<pre class="prettyprint linenums">yum -y install openssl openssl-devel
-</pre>
-
-<h1>下载编译nginx</h1>
-
-<p>完成了上述步骤后，终于可以来下载编译nginx了：</p>
-
-<pre class="prettyprint linenums">wget http://nginx.org/download/nginx-1.4.4.tar.gz
-tar -zxvf nginx-1.4.4.tar.gz
-cd nginx-1.4.4
-
-./configure --prefix=/apps/nginx \
---with-http_ssl_module \
---with-pcre=/apps/pcre-8.34 \
---with-zlib=/apps/zlib-1.2.8 
-
-make
-make install
-</pre>
-
-<p>运气不错，一切顺利，应该已经成功了。进入/apps就可以看到nginx目录。在nginx目录里面，就有一大堆编译生成的文件了。</p>
-
-<h1>修改nginx配置文件，运行</h1>
-
-<p>最后一步了，修改位于/apps/nginx/conf目录下的nginx.conf。
-我们用vim打开，修改简单的几个参数比如开启gzip,默认是用#注释掉的，我们去掉#符号。
-然后修改服务的root，使它指向gosk发布出来静态页面的目录：</p>
-
-<pre class="prettyprint linenums">server {
-    listen                   80;
-    server_name              cocosk.com;
-    root                     /publish;
-
-    location / {
-        index                index.html;
-    }
-}
-</pre>
-
-<p>这里只是简单的配置的，更复杂的使用以后再说了，最后运行位于/apps/nginx/sbin下的nginx文件。
-非常幸运，一切顺利，目前网站已经迁移到nginx下了~</p>
+<p>然后就可以从111.xx.xx.xx的私有仓库pull images了。</p>
 
 <p>##文档信息</p>
 
 <ul>
 <li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
-<li>原文网址：<a href="http://www.cocosk.com/articles/2014/2/6/nginx-use.html">http://www.cocosk.com/articles/<sup>2014</sup>⁄<sub>2</sub>/6/nginx-use.html</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2015/2/17/docker-pull-image-error.html">http://www.cocosk.com/articles/<sup>2015</sup>⁄<sub>2</sub>/17/docker-pull-image-error.html</a></li>
 <li>作者：卧雪Sirk</li>
 </ul>
 
@@ -208,7 +135,7 @@ make install
     <p class="meta">
 <span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
 
-<time data-updated="true" pubdate="" >2014-02-06 15:52:00</time>
+<time data-updated="true" pubdate="" >2015-02-17 11:52:00</time>
       
 
 <span class="categories">
