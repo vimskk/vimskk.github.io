@@ -144,15 +144,17 @@ docker images
 <code>bash
 docker run -it --name nfs-server --privileged scottkiss/nfs
 </code>
-执行完毕后进入容器终端
-修改配置
-<code>bash
-vi /etc/exports
-</code>
-在末尾加入
-<code>bash
-/exports *(rw,sync,no_subtree_check,fsid=0,no_root_squash)
-</code></p>
+执行完毕后进入容器终端</p>
+
+<p>修改配置</p>
+
+<pre><code class="bash">vi /etc/exports
+</code></pre>
+
+<p>在末尾加入</p>
+
+<pre><code class="bash">/exports *(rw,sync,no_subtree_check,fsid=0,no_root_squash)
+</code></pre>
 
 <p>然后执行</p>
 
