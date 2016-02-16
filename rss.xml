@@ -4,7 +4,7 @@
         <title>RSS 订阅酷酷时空</title>
         <link>cocosk.com</link>
         <description>RSS 酷酷时空</description>
-        <lastBuildDate>Tue, 16 Feb 2016 17:18:20 CST</lastBuildDate>
+        <lastBuildDate>Tue, 16 Feb 2016 17:22:59 CST</lastBuildDate>
         <language>zh-cn</language>
        
         <item>
@@ -53,19 +53,21 @@ EXPOSE 111/udp 2049/tcp
 &lt;pre&gt;&lt;code class=&#34;bash&#34;&gt; docker build -t=scottkiss/nfs .
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;运行该命令需要一段时间，成功后执行
-&lt;code&gt;bash
-docker images
-&lt;/code&gt;
-将会看到本地刚刚创建nfs的docker镜像&lt;/p&gt;
+&lt;p&gt;运行该命令需要一段时间，成功后执行&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;docker images
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将会看到本地刚刚创建nfs的docker镜像&lt;/p&gt;
 
 &lt;h2&gt;配置并运行nfs服务器&lt;/h2&gt;
 
-&lt;p&gt;执行
-&lt;code&gt;bash
-docker run -it --name nfs-server --privileged scottkiss/nfs
-&lt;/code&gt;
-执行完毕后进入容器终端&lt;/p&gt;
+&lt;p&gt;执行&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;docker run -it --name nfs-server --privileged scottkiss/nfs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;执行完毕后进入容器终端&lt;/p&gt;
 
 &lt;p&gt;修改配置&lt;/p&gt;
 

@@ -132,19 +132,21 @@ EXPOSE 111/udp 2049/tcp
 <pre><code class="bash"> docker build -t=scottkiss/nfs .
 </code></pre>
 
-<p>运行该命令需要一段时间，成功后执行
-<code>bash
-docker images
-</code>
-将会看到本地刚刚创建nfs的docker镜像</p>
+<p>运行该命令需要一段时间，成功后执行</p>
+
+<pre><code class="bash">docker images
+</code></pre>
+
+<p>将会看到本地刚刚创建nfs的docker镜像</p>
 
 <h2>配置并运行nfs服务器</h2>
 
-<p>执行
-<code>bash
-docker run -it --name nfs-server --privileged scottkiss/nfs
-</code>
-执行完毕后进入容器终端</p>
+<p>执行</p>
+
+<pre><code class="bash">docker run -it --name nfs-server --privileged scottkiss/nfs
+</code></pre>
+
+<p>执行完毕后进入容器终端</p>
 
 <p>修改配置</p>
 
