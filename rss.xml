@@ -4,7 +4,7 @@
         <title>RSS 订阅酷酷时空</title>
         <link>cocosk.com</link>
         <description>RSS 酷酷时空</description>
-        <lastBuildDate>Tue, 16 Feb 2016 17:11:31 CST</lastBuildDate>
+        <lastBuildDate>Tue, 16 Feb 2016 17:14:55 CST</lastBuildDate>
         <language>zh-cn</language>
        
         <item>
@@ -67,12 +67,13 @@ docker run -it --name nfs-server --privileged scottkiss/nfs
 &lt;/code&gt;
 执行完毕后进入容器终端
 修改配置
-```bash
-vi /etc/exports&lt;/p&gt;
-
-&lt;p&gt;在末尾加入
+&lt;code&gt;bash
+vi /etc/exports
+&lt;/code&gt;
+在末尾加入
+&lt;code&gt;bash
 /exports *(rw,sync,no_subtree_check,fsid=0,no_root_squash)
-```&lt;/p&gt;
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;然后执行&lt;/p&gt;
 
