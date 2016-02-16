@@ -77,10 +77,10 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">spring新手攻略（10）-注入内部Beans</h1>
+      <h1 class="entry-title">使用docker搭建nfs实现容器间共享文件</h1>
       <p class="meta">
         
-<time data-updated="true" pubdate="" >Posted Apr 5, 2014 </time>
+<time data-updated="true" pubdate="" >Posted Feb 16, 2016 </time>
         
 		
          | <a href="#duoshuo_thread">评论</a>
@@ -91,61 +91,120 @@
 
 
 <div class="entry-content">
-<h2>前言</h2>
+<p>首先介绍下今天的两个主角:nfs和docker</p>
 
-<p>在java中，我想大家都用过内部类，今天要介绍的是spring中注入的内部Beans，与内部类类似，顾名思义，它就是被定义在某个Bean中的内部Bean。听起来有点奇怪，还是看个简单的配置实例就清楚了:</p>
+<h2>nfs 是什么</h2>
 
-<pre class="prettyprint linenums">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+<p>NFS（Network File System）即网络文件系统，是FreeBSD支持的文件系统中的一种，它允许网络中的计算机之间通过TCP/IP网络共享资源。在NFS的应用中，本地NFS的客户端应用可以透明地读写位于远端NFS服务器上的文件，就像访问本地文件一样。
+摘自<a href="http://baike.baidu.com/link?url=QduB9ZQNclk4p1b8t5_eLcjmSShlkGHKQhdI7vvmCpz7p-1U2ta_2HmukKzIr7laQj6-jujjkp6T4GK6hfhbbS4A1FL7UJE0iU8ctvhv_Oa">百度百科</a></p>
 
-&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
-    xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
-    xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd&#34;&gt;
+<h2>docker 是什么</h2>
 
-    &lt;bean id=&#34;outerBean&#34; class=&#34;...&#34;&gt;
-        &lt;property name=&#34;target&#34;&gt;
-            &lt;bean id=&#34;innerBean&#34; class=&#34;...&#34;/&gt;
-        &lt;/property&gt;
-    &lt;/bean&gt;
-&lt;/beans&gt;
-</pre>
+<p>这个就不多说了,近两年一个非常流行的东西哦。</p>
 
-<p>如上所示，如果在一个bean的<property/>或者<constructor-arg/>元素标签内部定义的Bean则称为内部Bean。</p>
+<p>主角介绍完毕，那么要说说为什么要使用docker来搭建nfs，其实本文标题已经说明，主要目的还是为了实现容器间文件的共享。
+用过docker的都应该知道docker可以支持容器目录挂载到宿主机。而通过nfs，则可以将容器之间的目录实现共享挂载。如果你有多个容器间需要共享文件的需求，这个将是一个可以尝试的方案，具体使用场景看大家发挥想象了，今天这里主要实践一下如何实现这个功能。</p>
 
-<h2>用内部Bean改写<a href="http://cocosk.com/articles/2014/4/4/spring-dependency-injection-2.html">上一篇的例子</a></h2>
+<h2>涉及到的知识</h2>
 
-<p>由于大部分代码与<a href="http://cocosk.com/articles/2014/4/4/spring-dependency-injection-2.html">上一篇</a>一样，为了节省篇幅，这里只给出改动的部分，也就是xml配置文件：</p>
+<ul>
+<li>nfs安装</li>
+<li>docker容器间通信</li>
+<li>docker privileged</li>
+<li>dockerfile</li>
+<li>docker镜像</li>
+</ul>
 
-<pre class="prettyprint linenums">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
-    &lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
-xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
-xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd&#34;&gt;
+<h2>编写dockerfile</h2>
 
-    &lt;!-- &lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34;&gt;
-      &lt;constructor-arg ref=&#34;screen&#34;&gt;&lt;/constructor-arg&gt;
-    &lt;/bean&gt; --&gt;
+<pre><code class="bash">FROM ubuntu
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update -qq && apt-get install -y nfs-kernel-server runit inotify-tools -qq
+RUN mkdir -p /exports
 
-    &lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34;&gt;
-   &lt;!-- &lt;property name=&#34;screen&#34; ref=&#34;screen&#34;&gt;&lt;/property&gt; --&gt;
-    &lt;property name=&#34;screen&#34;&gt;
-    &lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt;
-    &lt;/property&gt;
-    &lt;/bean&gt;
-   &lt;!-- &lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt; --&gt;
-&lt;/beans&gt;
-</pre>
+VOLUME /exports
 
-<p>其中注释部分为上篇内容。是不是很简单？运行结果应该和上一篇一样哦。如果出错或者不一样，那说明程序哪里不对了，请仔细检查下。既然一样，为什么spring还要提供这种方式，而不是和上篇一样ref其它的bean呢？好问题，其实非要讨论它们的区别的话，可以理解为它们的作用域不太一样。这里的内部bean很明显只能被它外部包含它的bean可用，如上面例子，也就是id为tv的bean使用它。但是如果和上篇一样，把id为screen的bean放到外面，那么不仅仅id为tv的bean可以引用它，其它定义的bean也可以通过ref这种方式引用它。所以，在大多数情况下还是使用ref的方式的，除非你很确定某个bean只会被一个bean所用，不然就不建议使用inner bean了。另外，在inner bean中可以不定义id或者name，因为他很不需要被外部某些bean所引用，自然id或者name没什么作用了。</p>
+EXPOSE 111/udp 2049/tcp
+</code></pre>
 
-<h2>小结</h2>
+<h2>制作docker镜像</h2>
 
-<p>本文简单介绍了spring中的inner bean注入。是否觉得非常愉快呢，原来很简单啊,因为这是新手攻略嘛，总不好让新手看很复杂的东西吧，如果你觉得不过瘾，别担心，完成新手攻略后，博主打算搞一个升级版本的攻略(又要挖坑了-. -)，敬请期待哦！</p>
+<pre><code class="bash"> docker build -t=scottkiss/nfs .
+</code></pre>
+
+<p>运行该命令需要一段时间，成功后执行
+<code>bash
+docker images
+</code>
+将会看到本地刚刚创建nfs的docker镜像</p>
+
+<h2>配置并运行nfs服务器</h2>
+
+<p>执行
+<code>bash
+docker run -it --name nfs-server --privileged scottkiss/nfs
+</code>
+执行完毕后进入容器终端
+修改配置
+```bash
+vi /etc/exports</p>
+
+<p>在末尾加入
+/exports *(rw,sync,no_subtree_check,fsid=0,no_root_squash)
+```</p>
+
+<p>然后执行</p>
+
+<pre><code class="bash">exportfs -r
+</code></pre>
+
+<p>接着启动rpcbind服务</p>
+
+<pre><code class="bash">service rpcbind start
+</code></pre>
+
+<p>最后启动nfs服务</p>
+
+<pre><code class="bash">service nfs-kernel-server start
+</code></pre>
+
+<p>至此，不出意外，已经成功的启动了nfs服务器，并且将/exports目录共享了出去。这里，笔者在开始的时候遇到一坑，
+就是启动时候需要加上–privileged参数，否则启动nfs服务时候会提示权限不足报错。主要是这个过程中涉及到了mount操作，
+使用该参数后使得container内的root拥有真正的root权限，这样就不会报错了。</p>
+
+<h2>配置并启动客户端</h2>
+
+<p>客户端就简单多了，不需要像服务器那样配置了。
+执行</p>
+
+<pre><code class="bash">docker run -it --link nfs-server:nfs  --privileged scottkiss/nfs
+</code></pre>
+
+<p>进入容器终端。然后执行</p>
+
+<pre><code class="bash">service rpcbind start
+</code></pre>
+
+<p>接着执行远程挂载命令</p>
+
+<pre><code class="bash">mount -t nfs -o proto=tcp,port=2049 $NFS_PORT_2049_TCP_ADDR:/exports /home
+</code></pre>
+
+<p>这样，便将服务器的exports目录挂载到了客户端的home目录了。</p>
+
+<p>迫不及待的可以试试了，如在server终端的/exports目录下添加一个文件，在client的/home下也会同步添加。</p>
+
+<p>这里涉及的主要就是–link参数，这个参数就是告诉Docker容器需要使用nfs-server这个容器并将其别名命名为nfs。这样,就可以使用$NFS_PORT_2049_TCP_ADDR来获取服务器ip了。</p>
+
+<h2>总结</h2>
+
+<p>以上所有只是为了测试而做的一个粗糙的方案，还有很多改进之处，包括dockerfile，这里为了便于试验，尽量使用了简单粗暴的方式。</p>
 
 <p>##文档信息</p>
 
 <ul>
 <li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
-<li>原文网址：<a href="http://www.cocosk.com/articles/2014/4/5/spring-injecting-inner-beans.html">http://www.cocosk.com/articles/<sup>2014</sup>⁄<sub>4</sub>/5/spring-injecting-inner-beans.html</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2015/2/16/docker-nfs.html">http://www.cocosk.com/articles/<sup>2016</sup>⁄<sub>2</sub>/16/docker-nfs.html</a></li>
 <li>作者：卧雪Sirk</li>
 </ul>
 
@@ -155,7 +214,7 @@ xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.s
     <p class="meta">
 <span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
 
-<time data-updated="true" pubdate="" >2014-04-05 22:12:00</time>
+<time data-updated="true" pubdate="" >2016-02-16 11:52:00</time>
       
 
 <span class="categories">

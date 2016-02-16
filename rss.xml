@@ -4,8 +4,132 @@
         <title>RSS 订阅酷酷时空</title>
         <link>cocosk.com</link>
         <description>RSS 酷酷时空</description>
-        <lastBuildDate>Tue, 17 Feb 2015 11:35:05 CST</lastBuildDate>
+        <lastBuildDate>Tue, 16 Feb 2016 17:11:31 CST</lastBuildDate>
         <language>zh-cn</language>
+       
+        <item>
+            <title>使用docker搭建nfs实现容器间共享文件</title>
+            <link>2016/2/16/docker-nfs.html</link>
+            <author>卧雪Sirk</author>
+            <pubDate>2016-02-16 11:52:00</pubDate>
+            <description>&lt;p&gt;首先介绍下今天的两个主角:nfs和docker&lt;/p&gt;
+
+&lt;h2&gt;nfs 是什么&lt;/h2&gt;
+
+&lt;p&gt;NFS（Network File System）即网络文件系统，是FreeBSD支持的文件系统中的一种，它允许网络中的计算机之间通过TCP/IP网络共享资源。在NFS的应用中，本地NFS的客户端应用可以透明地读写位于远端NFS服务器上的文件，就像访问本地文件一样。
+摘自&lt;a href=&#34;http://baike.baidu.com/link?url=QduB9ZQNclk4p1b8t5_eLcjmSShlkGHKQhdI7vvmCpz7p-1U2ta_2HmukKzIr7laQj6-jujjkp6T4GK6hfhbbS4A1FL7UJE0iU8ctvhv_Oa&#34;&gt;百度百科&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;docker 是什么&lt;/h2&gt;
+
+&lt;p&gt;这个就不多说了,近两年一个非常流行的东西哦。&lt;/p&gt;
+
+&lt;p&gt;主角介绍完毕，那么要说说为什么要使用docker来搭建nfs，其实本文标题已经说明，主要目的还是为了实现容器间文件的共享。
+用过docker的都应该知道docker可以支持容器目录挂载到宿主机。而通过nfs，则可以将容器之间的目录实现共享挂载。如果你有多个容器间需要共享文件的需求，这个将是一个可以尝试的方案，具体使用场景看大家发挥想象了，今天这里主要实践一下如何实现这个功能。&lt;/p&gt;
+
+&lt;h2&gt;涉及到的知识&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;nfs安装&lt;/li&gt;
+&lt;li&gt;docker容器间通信&lt;/li&gt;
+&lt;li&gt;docker privileged&lt;/li&gt;
+&lt;li&gt;dockerfile&lt;/li&gt;
+&lt;li&gt;docker镜像&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;编写dockerfile&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;FROM ubuntu
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update -qq &amp;&amp; apt-get install -y nfs-kernel-server runit inotify-tools -qq
+RUN mkdir -p /exports
+
+VOLUME /exports
+
+EXPOSE 111/udp 2049/tcp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;制作docker镜像&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt; docker build -t=scottkiss/nfs .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;运行该命令需要一段时间，成功后执行
+&lt;code&gt;bash
+docker images
+&lt;/code&gt;
+将会看到本地刚刚创建nfs的docker镜像&lt;/p&gt;
+
+&lt;h2&gt;配置并运行nfs服务器&lt;/h2&gt;
+
+&lt;p&gt;执行
+&lt;code&gt;bash
+docker run -it --name nfs-server --privileged scottkiss/nfs
+&lt;/code&gt;
+执行完毕后进入容器终端
+修改配置
+```bash
+vi /etc/exports&lt;/p&gt;
+
+&lt;p&gt;在末尾加入
+/exports *(rw,sync,no_subtree_check,fsid=0,no_root_squash)
+```&lt;/p&gt;
+
+&lt;p&gt;然后执行&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;exportfs -r
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;接着启动rpcbind服务&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;service rpcbind start
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最后启动nfs服务&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;service nfs-kernel-server start
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;至此，不出意外，已经成功的启动了nfs服务器，并且将/exports目录共享了出去。这里，笔者在开始的时候遇到一坑，
+就是启动时候需要加上–privileged参数，否则启动nfs服务时候会提示权限不足报错。主要是这个过程中涉及到了mount操作，
+使用该参数后使得container内的root拥有真正的root权限，这样就不会报错了。&lt;/p&gt;
+
+&lt;h2&gt;配置并启动客户端&lt;/h2&gt;
+
+&lt;p&gt;客户端就简单多了，不需要像服务器那样配置了。
+执行&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;docker run -it --link nfs-server:nfs  --privileged scottkiss/nfs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;进入容器终端。然后执行&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;service rpcbind start
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;接着执行远程挂载命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;mount -t nfs -o proto=tcp,port=2049 $NFS_PORT_2049_TCP_ADDR:/exports /home
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样，便将服务器的exports目录挂载到了客户端的home目录了。&lt;/p&gt;
+
+&lt;p&gt;迫不及待的可以试试了，如在server终端的/exports目录下添加一个文件，在client的/home下也会同步添加。&lt;/p&gt;
+
+&lt;p&gt;这里涉及的主要就是–link参数，这个参数就是告诉Docker容器需要使用nfs-server这个容器并将其别名命名为nfs。这样,就可以使用$NFS_PORT_2049_TCP_ADDR来获取服务器ip了。&lt;/p&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;以上所有只是为了测试而做的一个粗糙的方案，还有很多改进之处，包括dockerfile，这里为了便于试验，尽量使用了简单粗暴的方式。&lt;/p&gt;
+
+&lt;p&gt;##文档信息&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2015/2/16/docker-nfs.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2016&lt;/sup&gt;⁄&lt;sub&gt;2&lt;/sub&gt;/16/docker-nfs.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
        
         <item>
             <title>docker pull 私有仓库镜像出错的问题</title>
@@ -1020,249 +1144,6 @@ return true;
 &lt;ul&gt;
 &lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/5/25/texturepacker-use.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;5&lt;/sub&gt;/25/texturepacker-use.html&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        </item>
-       
-        <item>
-            <title>spring新手攻略（13）- spring注解(annotation)配置</title>
-            <link>2014/4/26/spring-annotation-configuration.html</link>
-            <author>卧雪Sirk</author>
-            <pubDate>2014-04-26 11:52:00</pubDate>
-            <description>&lt;h2&gt;前言&lt;/h2&gt;
-
-&lt;p&gt;在&lt;a href=&#34;http://cocosk.com/articles/2014/4/13/spring-autowire.html&#34;&gt;上一篇&lt;/a&gt;中，我们介绍了spring自动装配(autowire)的特性。而从系列一开始，我们似乎就一直在xml配置文件中捣鼓，包括上篇的自动装配。不过，自从spring2.5开始，spring还支持了基于注解(annotation)的配置方式。那么这篇我们就来介绍下这个特性，看看它能给我们带来多大的惊喜。&lt;/p&gt;
-
-&lt;h2&gt;基于annotation的配置&lt;/h2&gt;
-
-&lt;p&gt;在默认情况下，spring的annotation是没有开启的，为了支持这一特性，我们需要修改下配置文件如下：&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
-&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
-xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
-xmlns:context=&#34;http://www.springframework.org/schema/context&#34;
-xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd&#34;&gt;
-    &lt;context:annotation-config&gt;&lt;/context:annotation-config&gt;
-&lt;/beans&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;只要加入&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;context:annotation-config&gt;&lt;/context:annotation-config&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;上面这个配置，你就可以通过注解(annotation)的方式来完成上一篇中同样自动装配bean的功能。这个如何做？暂且保密，等等哦，往下看会有的。&lt;/p&gt;
-
-&lt;h2&gt;几个常用的annotation&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;@Required 这个注解应用于bean的setter方法。&lt;/li&gt;
-&lt;li&gt;@Autowired 这个注解应用于bean的属性setter方法，构造方法，属性等。&lt;/li&gt;
-&lt;li&gt;@Qualifier 这个注解一般会和@Autowired一起出现，当有多个bean具有相同类型的时候，你可以通过这个注解来明确指定是哪个bean。&lt;/li&gt;
-&lt;li&gt;JSR-250 Annotations spring还支持@Resource,@PostConstruct和@PreDestroy annotations等基于JSR-250的annotation。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;还挺多，新手会不会晕了，不过别担心，今天我们之挑一个和上篇有关的，剩下的下次介绍，这样做原因一是为了保持和上篇的连贯性，二是不要让新手一次接受太多东西，三呢是作者偷懒，今天不想写那么多了。。&lt;/p&gt;
-
-&lt;h2&gt;@Autowired 注解&lt;/h2&gt;
-
-&lt;p&gt;没错，今天就是它了，从名称可以看出它也是自动装配嘛，比上篇的基于xml的自动装配形象多了，当时才没有告诉我们呢，只是说了个byName什么的。什么？你记得了？那赶紧回去看上一篇吧。好了，那我们继续还是以上篇的例子。首先，我们将Beans.xml改成下面那样:&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
-&lt;beans xmlns=&#34;http://www.springframework.org/schema/beans&#34;
-xmlns:xsi=&#34;http://www.w3.org/2001/XMLSchema-instance&#34;
-xmlns:context=&#34;http://www.springframework.org/schema/context&#34;
-xsi:schemaLocation=&#34;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd&#34;&gt;
-
-    &lt;context:annotation-config&gt;&lt;/context:annotation-config&gt;
-
-    &lt;bean id=&#34;tv&#34; class=&#34;sirk_spring_tuto.demo.TV&#34;&gt;&lt;/bean&gt; 
-    &lt;bean id=&#34;screen&#34; class=&#34;sirk_spring_tuto.demo.CRTScreen&#34;&gt;&lt;/bean&gt;
-&lt;/beans&gt;
-&lt;/pre&gt;
-
-&lt;p&gt;然后再修改TV.java：&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;package sirk_spring_tuto.demo;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-public class TV {
-
-/**
- * 这里给属性增加自动装配注解
- */
-@Autowired
-private Screen screen;
-
-
-
-public void powerOn(){
-    this.screen.show();
-}
-
-public Screen getScreen() {
-    return screen;
-}
-
-public void setScreen(Screen screen) {
-    this.screen = screen;
-}
-}
-&lt;/pre&gt;
-
-&lt;p&gt;最后其他文件都不变，最后运行：&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;package sirk_spring_tuto.demo;
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-public class App {
-
-public static void main(String[] args) {
-    ApplicationContext ctx = new ClassPathXmlApplicationContext(&#34;Beans.xml&#34;);
-    TV tv = (TV) ctx.getBean(&#34;tv&#34;);
-    tv.powerOn();
-
-}
-
-}
-&lt;/pre&gt;
-
-&lt;p&gt;如果没有什么错误，结果将会和上一篇一样。但是竟然出错了：&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;Caused by: java.lang.NoClassDefFoundError: org/springframework/core/type/AnnotatedTypeMetadata
-&lt;/pre&gt;
-
-&lt;p&gt;看到如此异常，不必惊慌，没找到类，一定是忘记导入什么包了，原来在xml配置中新加入的context定义需要用到spring-context包，于是加入。最终终于运行成功啦。如果你还没成功，一定是什么地方写错了，认真检查哦。&lt;/p&gt;
-
-&lt;p&gt;如果已经成功，接着我们来尝试把注解用到setter方法上：&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;public class TV {
-
-
-private Screen screen;
-
-
-
-public void powerOn(){
-    this.screen.show();
-}
-
-public Screen getScreen() {
-    return screen;
-}
-
-/**
- * 这里给属性增加自动装配注解
- */
-@Autowired
-public void setScreen(Screen screen) {
-    this.screen = screen;
-}
-}
-&lt;/pre&gt;
-
-&lt;p&gt;一样可以哦，再来试下构造方法:&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;public class TV {
-
-private Screen screen;
-
-
-/**
- * 这里给属性增加自动装配注解
- */
-@Autowired
-public TV(Screen sc){
-    this.screen = sc;
-}
-
-
-public void powerOn(){
-    this.screen.show();
-}
-
-public Screen getScreen() {
-    return screen;
-}
-
-
-public void setScreen(Screen screen) {
-    this.screen = screen;
-}
-}
-&lt;/pre&gt;
-
-&lt;p&gt;是不是很简单？除了这几种用法，它还有另一种用法:&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;package sirk_spring_tuto.demo;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-
-
-public class TV {
-
-
-private Screen screen;
-private RemoteControl rc;
-
-
-/**
- * 这里给属性增加自动装配注解
- */
-@Autowired
-public TV(Screen sc){
-    this.screen = sc;
-}
-
-
-public void powerOn(){
-    this.screen.show();
-}
-
-public Screen getScreen() {
-    return screen;
-}
-
-
-public void setScreen(Screen screen) {
-    this.screen = screen;
-}
-
-public RemoteControl getRc() {
-    return rc;
-}
-
-@Autowired(required = false)
-public void setRc(RemoteControl rc) {
-    this.rc = rc;
-}
-
-}
-&lt;/pre&gt;
-
-&lt;p&gt;这里我们给电视机类新增了遥控属性，并且我们没有修改xml配置文件，也就是说，我们没有在配置文件中配置遥控类的bean，但是在setRc方法上面我们写的是：&lt;/p&gt;
-
-&lt;pre class=&#34;prettyprint linenums&#34;&gt;@Autowired(required = false)
-&lt;/pre&gt;
-
-&lt;p&gt;这样，尽管没有着要装配的bean，但是因为required是false，所以也没有报错，如果你去掉required=false，只留下@Autowired那就不一样了。这种用法实际不多，就不详细展开了。&lt;/p&gt;
-
-&lt;h2&gt;小结&lt;/h2&gt;
-
-&lt;p&gt;今天介绍了spring的基于annotation的配置，并以上篇为例子，使用@Autowired注解实现了下，并简要介绍了spring的几种主要注解，下文将介绍剩下的几种注解。&lt;/p&gt;
-
-&lt;p&gt;##文档信息&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;原文网址：&lt;a href=&#34;http://www.cocosk.com/articles/2014/4/26/spring-annotation-configuration.html&#34;&gt;http://www.cocosk.com/articles/&lt;sup&gt;2014&lt;/sup&gt;⁄&lt;sub&gt;4&lt;/sub&gt;/26/spring-annotation-configuration.html&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;作者：卧雪Sirk&lt;/li&gt;
 &lt;/ul&gt;
 </description>

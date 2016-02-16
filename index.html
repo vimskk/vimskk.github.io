@@ -77,6 +77,65 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/articles/2016/2/16/docker-nfs.html">使用docker搭建nfs实现容器间共享文件</a></h1>
+    
+      <p class="meta">
+<time data-updated="true" pubdate="" datetime="2014-04-24T21:58:00+08:00">Feb 16, 2016</time>
+        	
+         | <a href="/articles/2016/2/16/docker-nfs.html#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+  <div class="entry-content">
+	首先介绍下今天的两个主角:nfs和docker
+
+nfs 是什么
+
+NFS（Network File System）即网络文件系统，是FreeBSD支持的文件系统中的一种，它允许网络中的计算机之间通过TCP/IP网络共享资源。在NFS的应用中，本地NFS的客户端应用可以透明地读写位于远端NFS服务器上的文件，就像访问本地文件一样。
+摘自百度百科
+
+docker 是什么
+
+这个就不多说了,近两年一个非常流行的东西哦。
+
+主角介绍完毕，那么要说说为什么要使用docker来搭建nfs，其实本文标题已经说明，主要目的还是为了实现容器间文件的共享。
+用过docker的都应该知道docker可以支持容器目录挂载到宿主机。而通过nfs，则可以将容器之间的目录实现共享挂载。如果你有多个容器间需要共享文件的需求，这个将是一个可以尝试的方案，具体使用场景看大家发挥想象了，今天这里主要实践一下如何实现这个功能。
+
+涉及到的知识
+
+
+nfs安装
+docker容器间通信
+docker privileged
+dockerfile
+docker镜像
+
+
+编写dockerfile
+
+FROM ubuntu
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update -qq &amp;&amp; apt-get install -y nfs-kernel-server runit inotify-tools -qq
+RUN mkdir -p /exports
+
+VOLUME /exports
+
+EXPOSE 111/udp 2049/tcp
+
+
+制作do
+ </div>
+    <footer>
+      <a href="/articles/2016/2/16/docker-nfs.html" rel="full-article">阅读更多 →</a>
+    </footer>
+  
+    </article>
+  
+ <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/articles/2015/2/17/docker-pull-image-error.html">docker pull 私有仓库镜像出错的问题</a></h1>
     
       <p class="meta">
@@ -812,51 +871,6 @@ public void show() {
   
     </article>
   
- <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/articles/2014/4/3/spring-dependency-injection.html">spring新手攻略（8）-依赖注入(Dependency Injection)</a></h1>
-    
-      <p class="meta">
-<time data-updated="true" pubdate="" datetime="2014-04-24T21:58:00+08:00">Apr 3, 2014</time>
-        	
-         | <a href="/articles/2014/4/3/spring-dependency-injection.html#duoshuo_thread">评论</a>
-        
-      </p>
-    
-  </header>
-  <div class="entry-content">
-	前言
-
-由于种种原因，spring新手攻略已经中断好久了，最近打算重新把这个坑填完，不管如何，要有始有终嘛。好了，本篇主要来讲讲spring中大名鼎鼎的依赖注入（Dependency Injection）。
-
-引入
-
-在讲依赖注入之前，我们先来聊聊面向对象。在面向对象中，最常用到的两种技术是继承和组合，而在大多数情况下，似乎组合方式更好，至于为什么，可以查阅相关资料。说到组合，无非就是把一个类作为另一个类的属性。这确实非常强大，因为当一个类包含另一个类时，也就拥有了另一个类的功能。但是，在享受好处的同时也带来了不好的东西，一个明显的原因就是两个类之前耦合度增加了。这违背了软件工程中高内聚低耦合的原则。于是乎，spring框架看到了这点，并很好的解决了它。说到这里，读者可能疑惑，耦合度增加了又怎么样？有什么关系嘛!如果是写点小程序确实没关系，而且挺好的。但是当进行大规模的工程时候就能体会到它的重要性了。比如当你要对一个类进行单元测试的时候，如果对于另一个类依赖太大，那将会变得非常麻烦。为什么这么说呢？因为假设类A依赖的另一个类B在实例化的时候需要做一堆动作，比如要从数据库获取数据等。而你测试的时候，不想这么麻烦，因为你只想测试类A，至于它的一个属性类B则不关心。这时候，就轮到依赖注入登场了。还是从一个例子开始把：
-
-小示例
-
-假设你的应用程序中有一个文本编辑组件，你想给它提供一个拼写检查的功能。对于这样的一个需求，你可能会写下面的代码：
-
-public class TextEditor {
-   private SpellChecker spellChecker;
-   public TextEditor() {
-   spellChecker = new SpellChecker();
-  }
-}
-
-
-上面的代码片段，其实TextEditor就对Spellchecker产生了依赖，因为它必须实现一个Spellchecker类型的对象。现在我们要把Spellchecker的控制权交出来，于是有了下面的代码：
-
-pu
- </div>
-    <footer>
-      <a href="/articles/2014/4/3/spring-dependency-injection.html" rel="full-article">阅读更多 →</a>
-    </footer>
-  
-    </article>
-  
  
   
 </div>
@@ -906,6 +920,10 @@ pu
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/articles/2016/2/16/docker-nfs.html">使用docker搭建nfs实现容器间共享文件</a>
+      </li>
+    
+      <li class="post">
         <a href="/articles/2015/2/17/docker-pull-image-error.html">docker pull 私有仓库镜像出错的问题</a>
       </li>
     
@@ -923,10 +941,6 @@ pu
     
       <li class="post">
         <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
-      </li>
-    
-      <li class="post">
-        <a href="/articles/2014/6/15/talk-today.html">随便说说</a>
       </li>
     
   </ul>
