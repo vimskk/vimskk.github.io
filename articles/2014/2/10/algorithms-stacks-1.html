@@ -1,72 +1,68 @@
-
 <!DOCTYPE html>
-<html class="js video no-maskImage placeholder" lang="en" >   
-	<head>          
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>        
-	<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>        
-	<meta name="keywords" content="技术博客,技术分享,开源,程序员,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>        
-	<meta name="author" content="卧雪Sirk"/>        
-	<meta content="True" name="HandheldFriendly">
-	<meta content="320" name="MobileOptimized">
-	<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
-	<title>酷酷时空 - cocosk.com - 用酷酷的代码创造新的世界</title>
-	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
-	<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
-	<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
-	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
-	<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
-	<link rel="shortcut icon" href="/fav.ico"/>
-	<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
-	<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
-	
-	</head>
-	<body onload="prettyPrint()">
-		
+<html class="js video no-maskImage placeholder" lang="en" >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>
+<meta name="keywords" content="技术博客,开源,架构,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>
+<meta name="author" content="卧雪Sirk"/>
+<meta content="True" name="HandheldFriendly">
+<meta content="320" name="MobileOptimized">
+<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+<title>算法基础(2)–栈(一) - 酷酷时空 - cocosk.com</title>
+<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+<link rel="shortcut icon" href="/fav.ico"/>
+<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
 
-
+</head>
+<body onload="prettyPrint()">
 
 
 <nav role="navigation"><div class="navbar navbar-inverse">
-  <div class="navbar-inner">
-    <div class="container">
-      <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </a>
+<div class="navbar-inner">
+<div class="container">
+<a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</a>
 
-      <a href="/" class="brand">酷酷时空 - cocosk.com</a>
+<a href="/" class="brand">酷酷时空 - cocosk.com</a>
 
-      <div class="nav-collapse">
-        <ul class="nav">
-  		<li><a href="/" class="on-sel">Index</a></li>
-		<li><a href="/tag.html">Tags</a></li>
-		<li><a href="/category.html">Categories</a></li>
-		<li><a href="/archive.html">Archive</a></li>
-		
-		<li><a href="/pages/about.html" target="_self">About</a></li>
-		
-		<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
-		
-	</ul>
+<div class="nav-collapse">
+<ul class="nav">
+<li><a href="/" class="on-sel">Index</a></li>
+<li><a href="/tag.html">Tags</a></li>
+<li><a href="/category.html">Categories</a></li>
+<li><a href="/archive.html">Archive</a></li>
+
+<li><a href="/pages/about.html" target="_self">About</a></li>
+
+<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+
+</ul>
 
 
-        <ul data-subscription="rss" class="nav pull-right">
-          <li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
-          
-        </ul>
+<ul data-subscription="rss" class="nav pull-right">
+<li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
 
-        
-          <form method="get" action="http://google.com/search" class="pull-right navbar-search">
-            <fieldset role="search">
-              <input type="hidden" value="site:www.cocosk.com" name="q">
-              <input type="text" placeholder="Search" results="0" name="q" class="search-query">
-            </fieldset>
-          </form>
-        
-      </div>
-    </div>
-  </div>
+</ul>
+
+
+<form method="get" action="http://google.com/search" class="pull-right navbar-search">
+<fieldset role="search">
+<input type="hidden" value="site:www.cocosk.com" name="q">
+<input type="text" placeholder="Search" results="0" name="q" class="search-query">
+</fieldset>
+</form>
+
+</div>
+</div>
+</div>
 </div>
 </nav>
 <div class="container">
@@ -74,20 +70,20 @@
 
 <article role="article" class="hentry span9">
 
-  
-  <header class="page-header">
-    
-      <h1 class="entry-title">算法基础(2)–栈(一)</h1>
-      <p class="meta">
-        
+
+<header class="page-header">
+
+<h1 class="entry-title">算法基础(2)–栈(一)</h1>
+<p class="meta">
+
 <time data-updated="true" pubdate="" >Posted Feb 10, 2014 </time>
-        
-		
-         | <a href="#duoshuo_thread">评论</a>
-        
-      </p>
-    
-  </header>
+
+
+| <a href="#duoshuo_thread">评论</a>
+
+</p>
+
+</header>
 
 
 <div class="entry-content">
@@ -200,123 +196,123 @@ struct,其中Node表示链表中的一个节点，而Stack则是栈的定义。�
 
 </div>
 
-  <footer>
-    <p class="meta">
+<footer>
+<p class="meta">
 <span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
 
 <time data-updated="true" pubdate="" >2014-02-10 22:01:00</time>
-      
+
 
 <span class="categories">
-  
+
 </span>
 </p>
 
-   <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
 
 
-    <section>
-      
-        <div class="" id="duoshuo_thread" aria-live="polite">
-        <div id="ds-thread" class="ds-thread"></div></div><br/>
-        
-       
- 
+<section>
+
+<div class="" id="duoshuo_thread" aria-live="polite">
+<div id="ds-thread" class="ds-thread"></div></div><br/>
+
+
+
 </section>    
-  </footer>
+</footer>
 </article>
 
 <aside class="sidebar-nav span3">
-  
-    <section>
-  <h2>公告</h2>
-  <p>萬物靜觀皆自得,四時佳興與人同</p>
-  <p></p>
-</section>
-<section>
-  <h2>分类目录</h2>
-    <ul id="category-list">
-
-	<li><a href="/category.html#algorithms">algorithms</a></li>
-
-	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
-
-	<li><a href="/category.html#docker">docker</a></li>
-
-	<li><a href="/category.html#hadoop">hadoop</a></li>
-
-	<li><a href="/category.html#ios">ios</a></li>
-
-	<li><a href="/category.html#java">java</a></li>
-
-	<li><a href="/category.html#javascript">javascript</a></li>
-
-	<li><a href="/category.html#jvm">jvm</a></li>
-
-	<li><a href="/category.html#nginx">nginx</a></li>
-
-	<li><a href="/category.html#spring">spring</a></li>
-
-	<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
-
-	<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
-
-    </ul>
-</section>
-
 
 <section>
-  <h2>最新文章</h2>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/articles/2016/2/16/docker-nfs.html">使用docker搭建nfs实现容器间共享文件</a>
-      </li>
-    
-      <li class="post">
-        <a href="/articles/2015/2/17/docker-pull-image-error.html">docker pull 私有仓库镜像出错的问题</a>
-      </li>
-    
-      <li class="post">
-        <a href="/articles/2015/2/7/learn-ios-dev-faster-oc-1.html">快速学习ios开发：Objective-C基础(一)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
-      </li>
-    
-      <li class="post">
-        <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
-      </li>
-    
-  </ul>
+<h2>公告</h2>
+<p>萬物靜觀皆自得,四時佳興與人同</p>
+<p></p>
+</section>
+<section>
+<h2>分类目录</h2>
+<ul id="category-list">
+
+<li><a href="/category.html#algorithms">algorithms</a></li>
+
+<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+<li><a href="/category.html#docker">docker</a></li>
+
+<li><a href="/category.html#hadoop">hadoop</a></li>
+
+<li><a href="/category.html#ios">ios</a></li>
+
+<li><a href="/category.html#java">java</a></li>
+
+<li><a href="/category.html#javascript">javascript</a></li>
+
+<li><a href="/category.html#jvm">jvm</a></li>
+
+<li><a href="/category.html#nginx">nginx</a></li>
+
+<li><a href="/category.html#spring">spring</a></li>
+
+<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+</ul>
+</section>
+
+
+<section>
+<h2>最新文章</h2>
+<ul id="recent_posts">
+
+<li class="post">
+<a href="/articles/2016/2/16/docker-nfs.html">使用docker搭建nfs实现容器间共享文件</a>
+</li>
+
+<li class="post">
+<a href="/articles/2015/2/17/docker-pull-image-error.html">docker pull 私有仓库镜像出错的问题</a>
+</li>
+
+<li class="post">
+<a href="/articles/2015/2/7/learn-ios-dev-faster-oc-1.html">快速学习ios开发：Objective-C基础(一)</a>
+</li>
+
+<li class="post">
+<a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+</li>
+
+<li class="post">
+<a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
+</li>
+
+</ul>
 </section>
 
 <section>
-  <h2>友情链接</h2>
-  <ul>
-    <li>
-      <a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
-    </li>
-  </ul>
+<h2>友情链接</h2>
+<ul>
+<li>
+<a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+</li>
+</ul>
 </section>
 
 <section>
 <h2>最新评论</h2>
 <ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
- 
-        <script type="text/javascript">  
-        var duoshuoQuery = {short_name:"cocosk"};  
-        (function() {    
-        var ds = document.createElement('script');    
-        ds.type = 'text/javascript';
-        ds.async = true;    
-        ds.src = 'http://static.duoshuo.com/embed.js';    
-        ds.charset = 'UTF-8';    
-        (document.getElementsByTagName('head')[0]||
-        document.getElementsByTagName('body')[0]).appendChild(ds); 
-        })(); 
- </script>
+
+<script type="text/javascript">  
+var duoshuoQuery = {short_name:"cocosk"};  
+(function() {    
+ var ds = document.createElement('script');    
+ ds.type = 'text/javascript';
+ ds.async = true;    
+ ds.src = 'http://static.duoshuo.com/embed.js';    
+ ds.charset = 'UTF-8';    
+ (document.getElementsByTagName('head')[0]||
+  document.getElementsByTagName('body')[0]).appendChild(ds); 
+ })(); 
+</script>
 </section>
 
 </aside>
@@ -328,11 +324,11 @@ struct,其中Node表示链表中的一个节点，而Stack则是栈的定义。�
 
 <script type="text/javascript">
 window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
- </script>
+</script>
 
 
 <footer class="page-footer" role="contentinfo">
-<p id="copyright">Copyright (c) 2014 - 2015 cocosk.com &nbsp;
+<p id="copyright">Copyright (c) 2014 - 2016 cocosk.com &nbsp;
  		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
 </p>
 <span style="display:none;">
