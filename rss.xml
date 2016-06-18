@@ -4,7 +4,7 @@
         <title>RSS 订阅酷酷时空</title>
         <link>cocosk.com</link>
         <description>RSS 酷酷时空</description>
-        <lastBuildDate>Sat, 18 Jun 2016 23:41:35 CST</lastBuildDate>
+        <lastBuildDate>Sat, 18 Jun 2016 23:43:50 CST</lastBuildDate>
         <language>zh-cn</language>
        
         <item>
@@ -12,7 +12,7 @@
             <link>2016/6/18/go-ssh-client-1.html</link>
             <author>卧雪Sirk</author>
             <pubDate>2016-06-18 11:52:00</pubDate>
-            <description>&lt;h2&gt;🏂热身运动&lt;/h2&gt;
+            <description>&lt;h2&gt;热身运动🏂&lt;/h2&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;在开始之前，先来个热身运动。虽然标题党写着快速打造一个ssh客户端，但是和跑步一样，在运动前还是需要先热身一下，不然到时候身体(大脑)会吃不消。所以，在开始前，我们先来科普一下ssh的一些东西。&lt;/p&gt;
@@ -24,23 +24,23 @@
 &lt;p&gt;其实接触过后端开发的同学对于ssh应该都不陌生，可能每天你都在使用它，没错，当你要远程登录服务器的时候，大多数情况下都离不开它，俨然已经成为Linux系统的标准配置。所以，如果你使用的是Linux操作系统，那么默认情况下就已经自带ssh的客户端了，于是乎你直接可以在Linux的shell中执行: &lt;code&gt;ssh user@host&lt;/code&gt; 就可以安全的登录到了远程主机host。对于ssh的更多命令或者玩法今天就不多介绍了，因为这不是今天的主要目标，今天的主要任务是实现一个和Linux操作系统中默认自带的ssh命令行客户端一样的使用go语言开发的ssh命令行客户端，当然由于时间篇幅有限，这次并不会实现原生ssh命令行客户端的全部功能，主要是能够实现远程登录到远程host，并能进行命令行操作。对于其他高级命令，如端口转发等将在后续完成。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;h2&gt;🔪工欲善其事必先利其器&lt;/h2&gt;
+&lt;h2&gt;工欲善其事必先利其器🔪&lt;/h2&gt;
 
 &lt;p&gt;既然说了要快速打造，那么必然需要借助一些现有的工具包了，这边为了完成这个客户端，笔者对原生的go语言的ssh包进行了一下封装做了一个小工具包gosshtool,可以从&lt;a href=&#34;http://git.oschina.net/scottkiss/gosshtool&#34;&gt;码云&lt;/a&gt;或者&lt;a href=&#34;https://github.com/scottkiss/gosshtool&#34;&gt;github&lt;/a&gt;找到。有了它，再来做ssh的客户端就轻松多了。&lt;/p&gt;
 
-&lt;h2&gt;💻开始设计&lt;/h2&gt;
+&lt;h2&gt;开始设计💻&lt;/h2&gt;
 
 &lt;p&gt;首先，要完成一个命令行的ssh客户端，我们先来看下Linux下自带的ssh客户端是怎么工作的。这里所说的怎么工作，会站在比较高层的角度，因为ssh的整个通讯协议比较复杂，这里不过多介绍，原因是go提供的ssh包已经把底层的一些协议实现了，这里没必要自己再写一套实现出来，如果你确实对底层协议有兴趣，可以自己去网上查阅文档。那么站在比较高层角度来看，是如何的呢？
 &gt;我们还原一个最常见的场景：某一天，你想登录远程主机，于是你打开了Linux的shell，
 输入&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;ssh user@host
-&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;ssh user@host
+&lt;/pre&gt;
 
 &lt;p&gt;然后输入密码后顺利的登录了host这个主机，接着你在shell输入一些命令，比如&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;ls
-&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;ls
+&lt;/pre&gt;
 
 &lt;p&gt;查看远程主机当前目录下所有文件。&lt;/p&gt;
 
