@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html class="js video no-maskImage placeholder" lang="en" >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="description" content="开源爱好者的技术博客,相信技术改变世界,用酷酷的代码创造新世界 - cocosk.com"/>
+<meta name="keywords" content="技术博客,开源,架构,算法,软件开发,Go,java,Python,Javascript,Erlang,Game,Cocos2d-x,Programmer"/>
+<meta name="author" content="卧雪Sirk"/>
+<meta content="True" name="HandheldFriendly">
+<meta content="320" name="MobileOptimized">
+<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport">
+<title>使用go的ssh包快速打造一个本地命令行ssh客户端 - 酷酷时空 - cocosk.com</title>
+<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/normalize.css"/>
+<link rel="stylesheet" href="/assets/themes/bs/plugin/prettify/prettify_night.css"/>
+<link rel="stylesheet" href="/assets/themes/bs/css/main.css"/>
+<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/bootstrap.css">
+<link type="text/css" rel="stylesheet" media="screen, projection" href="/assets/themes/bs/css/responsive.css">
+<link rel="shortcut icon" href="/fav.ico"/>
+<script type="text/javascript" src="/assets/themes/bs/plugin/prettify/prettify.js"></script>
+<script type="text/javascript" src="/assets/themes/bs/js/jquery.js"></script>
+
+</head>
+<body onload="prettyPrint()">
+
+
+<nav role="navigation"><div class="navbar navbar-inverse">
+<div class="navbar-inner">
+<div class="container">
+<a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar">
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</a>
+
+<a href="/" class="brand">酷酷时空 - cocosk.com</a>
+
+<div class="nav-collapse">
+<ul class="nav">
+<li><a href="/" class="on-sel">Index</a></li>
+<li><a href="/tag.html">Tags</a></li>
+<li><a href="/category.html">Categories</a></li>
+<li><a href="/archive.html">Archive</a></li>
+
+<li><a href="/pages/about.html" target="_self">About</a></li>
+
+<li><a href="https://github.com/scottkiss/gosk" target="_blank">Github</a></li>
+
+</ul>
+
+
+<ul data-subscription="rss" class="nav pull-right">
+<li><a title="subscribe via RSS" rel="subscribe-rss" href="/rss.xml">RSS</a></li>
+
+</ul>
+
+
+<form method="get" action="http://google.com/search" class="pull-right navbar-search">
+<fieldset role="search">
+<input type="hidden" value="site:www.cocosk.com" name="q">
+<input type="text" placeholder="Search" results="0" name="q" class="search-query">
+</fieldset>
+</form>
+
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="container">
+<div class="row-fluid">
+
+<article role="article" class="hentry span9">
+
+
+<header class="page-header">
+
+<h1 class="entry-title">使用go的ssh包快速打造一个本地命令行ssh客户端</h1>
+<p class="meta">
+
+<time data-updated="true" pubdate="" >Posted Jun 18, 2016 </time>
+
+
+| <a href="#duoshuo_thread">评论</a>
+
+</p>
+
+</header>
+
+
+<div class="entry-content">
+<p>###🏂热身运动
+>在开始之前，先来个热身运动。虽然标题党写着快速打造一个ssh客户端，但是和跑步一样，在运动前还是需要先热身一下，不然到时候身体(大脑)会吃不消。所以，在开始前，我们先来科普一下ssh的一些东西。</p>
+
+<blockquote>
+<p>先来说说ssh，这里的ssh是指由IETF的网络小组（Network Working Group）所制定的为建立在应用层和传输层基础上的安全协议。（对于了解这个协议的请忽略本段文字😱）<a href="http://baike.baidu.com/link?url=FaRrDm1hC0Xc-R-yqycKE83g2y7HziNpMuYehYI2E2HoYadXU4x_yD2jdMmTOafhhxhETKHNYthn2vKpAsGWFIqAURBvx2l2Zza_cV8FECW">点这里了解更多ssh介绍</a></p>
+
+<p>写过java web应用的同学应该还知道另一个ssh(struts+spring+hibernate),当然今天的主角并不是它。😅</p>
+
+<p>其实接触过后端开发的同学对于ssh应该都不陌生，可能每天你都在使用它，没错，当你要远程登录服务器的时候，大多数情况下都离不开它，俨然已经成为Linux系统的标准配置。所以，如果你使用的是Linux操作系统，那么默认情况下就已经自带ssh的客户端了，于是乎你直接可以在Linux的shell中执行: <code>ssh user@host</code> 就可以安全的登录到了远程主机host。对于ssh的更多命令或者玩法今天就不多介绍了，因为这不是今天的主要目标，今天的主要任务是实现一个和Linux操作系统中默认自带的ssh命令行客户端一样的使用go语言开发的ssh命令行客户端，当然由于时间篇幅有限，这次并不会实现原生ssh命令行客户端的全部功能，主要是能够实现远程登录到远程host，并能进行命令行操作。对于其他高级命令，如端口转发等将在后续完成。</p>
+</blockquote>
+
+<p>###🔪工欲善其事必先利其器</p>
+
+<p>既然说了要快速打造，那么必然需要借助一些现有的工具包了，这边为了完成这个客户端，笔者对原生的go语言的ssh包进行了一下封装做了一个小工具包gosshtool,可以从<a href="http://git.oschina.net/scottkiss/gosshtool">码云</a>或者<a href="https://github.com/scottkiss/gosshtool">github</a>找到。有了它，再来做ssh的客户端就轻松多了。</p>
+
+<p>###💻开始设计
+首先，要完成一个命令行的ssh客户端，我们先来看下Linux下自带的ssh客户端是怎么工作的。这里所说的怎么工作，会站在比较高层的角度，因为ssh的整个通讯协议比较复杂，这里不过多介绍，原因是go提供的ssh包已经把底层的一些协议实现了，这里没必要自己再写一套实现出来，如果你确实对底层协议有兴趣，可以自己去网上查阅文档。那么站在比较高层角度来看，是如何的呢？
+>我们还原一个最常见的场景：某一天，你想登录远程主机，于是你打开了Linux的shell，
+输入</p>
+
+<pre><code class="bash">ssh user@host
+</code></pre>
+
+<p>然后输入密码后顺利的登录了host这个主机，接着你在shell输入一些命令，比如</p>
+
+<pre><code class="bash">ls
+</code></pre>
+
+<p>查看远程主机当前目录下所有文件。</p>
+
+<p>上述场景的过程，我们可以简单画一个图，来看看你这些操作是怎么与远程主机通讯的，如下图：
+<a href="/images/go-ssh-client/aaa.png"><img src="/images/go-ssh-client/aaa.png" alt="" />
+</a></p>
+
+<p>根据上图，我们开始设计，首先要想办法读取用户的键盘输入，如：输入</p>
+
+<pre><code class="bash">pwd
+</code></pre>
+
+<p>在go语言中，我们可以使用os和bufio两个包，关键代码如下：</p>
+
+<pre><code class="go">inputReader := bufio.NewReader(os.Stdin)
+input, err := inputReader.ReadString('\n')
+</code></pre>
+
+<p>如上代码，我们就可以读取以换行结束的字符串。</p>
+
+<p>这样完成了图中的第一步，第二步，我们将要建立与远程主机的ssh连接，这时候可以用到前面介绍的工具gosshtool了，有了它完成这一步变得轻松许多。在介绍这一步之前，我们先来对这个将要实现的客户端再多啰嗦几句，为了使我们的客户端看起来更像Linux自带的ssh客户端，我们假设将要做的这个客户端名字叫sshcmd，我们将要完成的任务是到时候生成一个叫sshcmd的可执行文件，然后执行</p>
+
+<pre><code class="bash">./sshcmd user@host 
+</code></pre>
+
+<p>就建立了远程ssh连接，并返回远程主机登录信息，接着你可以继续在控制台输入后续命令，这些命令实际上是在远程主机执行的，就像Linux自带的ssh客户端一样。所以，我们还要用到go的一个叫做flag的包，这个包在写命令行程序的时候非常有用，它可以方便的对命令参数进行解析。所以我们会写到如下关键代码：</p>
+
+<pre><code class="go">func main() {
+  flag.StringVar(&host, "h", "", "host")
+  flag.StringVar(&passwd, "p", "", "password")
+  flag.Parse()
+  hostsp := strings.Split(host, "@")
+  user = hostsp[0]
+  host = hostsp[1]
+}
+</code></pre>
+
+<p>我们从命令行读取了user,host,password三个重要参数。有了它们，可以就可以建立ssh连接了关键代码如下：</p>
+
+<pre><code class="go"> config := &gosshtool.SSHClientConfig{
+    User:     user,
+    Password: passwd,
+    Host:     host,
+  }
+  sshclient := gosshtool.NewSSHClient(config)
+  _, err := sshclient.Connect()
+  if err == nil {
+    fmt.Println("ssh connect success")
+  } else {
+    fmt.Println("ssh connect failed")
+  }
+  modes := ssh.TerminalModes{
+    ssh.ECHO:          0,
+    ssh.TTY_OP_ISPEED: 14400,
+    ssh.TTY_OP_OSPEED: 14400,
+  }
+  pty := &gosshtool.PtyInfo{
+    Term:  "xterm-256color",
+    H:     80,
+    W:     40,
+    Modes: modes,
+  }
+  session, err := sshclient.Pipe(conn, pty, nil, 30)
+  if err != nil {
+    fmt.Println(err)
+  }
+  defer session.Close()
+
+</code></pre>
+
+<p>我们使用了gosshtool的NewSSHClient方法创建了一个客户端，并调用Connect()建立了连接，最后使用了Pipe(conn, pty, nil, 30)方法创建了一个保持会话，这样就号好了。这一切看起来如此简单，都要归功于Pipe这个方法，它的第一个参数是一个ReadWriteCloser接口类型，只要实现了该接口的结构都可以传入，这里我们会使用TCPConn这个结构，该结构实现了net.Conn接口，而net.Conn接口也是实现了ReadWriteCloser接口的。这个参数非常重要，我们建立了连接后，后续的通信全靠它了。你如果熟悉ReadWriteCloser接口，其实你就知道这个接口又组合了三个接口：</p>
+
+<pre><code class="go">type ReadWriteCloser interface {
+    Reader
+    Writer
+    Closer
+}
+
+type Writer interface {
+    Write(p []byte) (n int, err error)
+}
+
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+
+type Closer interface {
+    Close() error
+}
+
+</code></pre>
+
+<p>再看net.Conn接口：</p>
+
+<pre><code class="go">type Conn interface {
+    // Read从连接中读取数据
+    // Read方法可能会在超过某个固定时间限制后超时返回错误，该错误的Timeout()方法返回真
+    Read(b []byte) (n int, err error)
+    // Write从连接中写入数据
+    // Write方法可能会在超过某个固定时间限制后超时返回错误，该错误的Timeout()方法返回真
+    Write(b []byte) (n int, err error)
+    // Close方法关闭该连接
+    // 并会导致任何阻塞中的Read或Write方法不再阻塞并返回错误
+    Close() error
+    // 返回本地网络地址
+    LocalAddr() Addr
+    // 返回远端网络地址
+    RemoteAddr() Addr
+    // 设定该连接的读写deadline，等价于同时调用SetReadDeadline和SetWriteDeadline
+    // deadline是一个绝对时间，超过该时间后I/O操作就会直接因超时失败返回而不会阻塞
+    // deadline对之后的所有I/O操作都起效，而不仅仅是下一次的读或写操作
+    // 参数t为零值表示不设置期限
+    SetDeadline(t time.Time) error
+    // 设定该连接的读操作deadline，参数t为零值表示不设置期限
+    SetReadDeadline(t time.Time) error
+    // 设定该连接的写操作deadline，参数t为零值表示不设置期限
+    // 即使写入超时，返回值n也可能>0，说明成功写入了部分数据
+    SetWriteDeadline(t time.Time) error
+}
+</code></pre>
+
+<p>对比下会发现Conn接口也实现了</p>
+
+<ul>
+<li>Read(b []byte) (n int, err error)</li>
+<li>Write(b []byte) (n int, err error)</li>
+<li>Close() error</li>
+</ul>
+
+<p>这也说明了，确实我们可以将net.Conn的参数传入。通过接口方法，其实也可以看出这些接口都有一个共同作用，可以对字节进行读写操作。而我们要与远程主机网络通信，当然少不了这些。因此，所有实现以上三个方法的结构都是可以传入并于远程主机建立的ssh连接通信的。这里，我们的想法是：在本地起一个socket服务，并接受标准输入，最终将标准输入的数据通过Pipe转发给远程主机，实现本地终端输入命令通过ssh协议远程执行如下图：</p>
+
+<p><a href="/images/go-ssh-client/bbb.png"><img src="/images/go-ssh-client/bbb.png" alt="" />
+</a></p>
+
+<p>正如图中所示，实际上Pipe方法可以理解为将tcp连接转成了ssh连接并可以通过它传递数据。当然也可以将websocket的连接转成ssh连接，这样就可以实现基于web网页的ssh客户端了，也是非常简单的，这个后续介绍。介绍到这里，大部分关键的点都已经说完了，这里只是简单实现了一个最简单版本的ssh命令行客户端，当然通过gosshtool还可以做很多好玩的东西，比如部署工具，本地转发服务，命令行运维工具等。最后，最最关键的，放上本次实践的完整源码：
+<a href="https://github.com/scottkiss/sshcmd">sshcmd源码</a></p>
+
+<p>###总结
+本文介绍了如何打造一个本地命令行ssh客户端，如果基于现成的工具包确实没多少工作量，而且大部分功能都实现比较粗糙，权当抛砖引玉。</p>
+
+<p>##文档信息</p>
+
+<ul>
+<li>版权声明：自由转载-非商用-非衍生-保持署名 | <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">Creative Commons BY-NC-ND 3.0</a></li>
+<li>原文网址：<a href="http://www.cocosk.com/articles/2016/6/18/go-ssh-client-1.html">http://www.cocosk.com/articles/<sup>2016</sup>⁄<sub>6</sub>/18/go-ssh-client-1.html</a></li>
+<li>作者：卧雪Sirk</li>
+</ul>
+
+</div>
+
+<footer>
+<p class="meta">
+<span class="byline author vcard">Posted by <span class="fn">卧雪Sirk</span></span>
+
+<time data-updated="true" pubdate="" >2016-06-18 11:52:00</time>
+
+
+<span class="categories">
+
+</span>
+</p>
+
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+
+
+<section>
+
+<div class="" id="duoshuo_thread" aria-live="polite">
+<div id="ds-thread" class="ds-thread"></div></div><br/>
+
+
+
+</section>    
+</footer>
+</article>
+
+<aside class="sidebar-nav span3">
+
+<section>
+<h2>公告</h2>
+<p>萬物靜觀皆自得,四時佳興與人同</p>
+<p></p>
+</section>
+<section>
+<h2>分类目录</h2>
+<ul id="category-list">
+
+<li><a href="/category.html#algorithms">algorithms</a></li>
+
+<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
+
+<li><a href="/category.html#docker">docker</a></li>
+
+<li><a href="/category.html#golang">golang</a></li>
+
+<li><a href="/category.html#hadoop">hadoop</a></li>
+
+<li><a href="/category.html#ios">ios</a></li>
+
+<li><a href="/category.html#java">java</a></li>
+
+<li><a href="/category.html#javascript">javascript</a></li>
+
+<li><a href="/category.html#jvm">jvm</a></li>
+
+<li><a href="/category.html#nginx">nginx</a></li>
+
+<li><a href="/category.html#spring">spring</a></li>
+
+<li><a href="/category.html#%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab">图像识别</a></li>
+
+<li><a href="/category.html#%e7%94%9f%e6%b4%bb%e9%9a%8f%e7%ac%94">生活随笔</a></li>
+
+</ul>
+</section>
+
+
+<section>
+<h2>最新文章</h2>
+<ul id="recent_posts">
+
+<li class="post">
+<a href="/articles/2016/6/18/go-ssh-client-1.html">使用go的ssh包快速打造一个本地命令行ssh客户端</a>
+</li>
+
+<li class="post">
+<a href="/articles/2016/2/16/docker-nfs.html">使用docker搭建nfs实现容器间共享文件</a>
+</li>
+
+<li class="post">
+<a href="/articles/2015/2/17/docker-pull-image-error.html">docker pull 私有仓库镜像出错的问题</a>
+</li>
+
+<li class="post">
+<a href="/articles/2015/2/7/learn-ios-dev-faster-oc-1.html">快速学习ios开发：Objective-C基础(一)</a>
+</li>
+
+<li class="post">
+<a href="/articles/2014/8/17/cocos2d-x-3-android-Admob-InterstitialAd.html">cocos2d-x 3.0学习-Android中集成Admob插页广告</a>
+</li>
+
+</ul>
+</section>
+
+<section>
+<h2>友情链接</h2>
+<ul>
+<li>
+<a title="cnblogs博客" href="http://cnblogs.com/vimsk">在cnblogs的博客</a>
+</li>
+</ul>
+</section>
+
+<section>
+<h2>最新评论</h2>
+<ul data-excerpt-length="32" data-show-admin="0" data-show-title="1" data-show-time="1" data-show-avatars="1" data-num-items="5" class="ds-recent-comments" id="ds-recent-comments"></ul>
+
+<script type="text/javascript">  
+var duoshuoQuery = {short_name:"cocosk"};  
+(function() {    
+ var ds = document.createElement('script');    
+ ds.type = 'text/javascript';
+ ds.async = true;    
+ ds.src = 'http://static.duoshuo.com/embed.js';    
+ ds.charset = 'UTF-8';    
+ (document.getElementsByTagName('head')[0]||
+  document.getElementsByTagName('body')[0]).appendChild(ds); 
+ })(); 
+</script>
+</section>
+
+</aside>
+
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+
+<footer class="page-footer" role="contentinfo">
+<p id="copyright">Copyright (c) 2014 - 2016 cocosk.com &nbsp;
+ 		Powered by <a href="https://github.com/scottkiss/gosk">gosk</a>
+</p>
+<span style="display:none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000348290'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s22.cnzz.com/z_stat.php%3Fid%3D1000348290' type='text/javascript'%3E%3C/script%3E"));</script>
+</span>
+
+</footer>
+	
+	<script type="text/javascript" src="/assets/themes/bs/js/bootstrap.js"></script>
+ </body>
+ </html>
+
