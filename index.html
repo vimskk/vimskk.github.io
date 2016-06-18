@@ -77,6 +77,42 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/articles/2016/6/16/go-ssh-client-1.html">使用go的ssh包快速打造一个本地命令行ssh客户端</a></h1>
+    
+      <p class="meta">
+<time data-updated="true" pubdate="" datetime="2014-04-24T21:58:00+08:00">Jun 16, 2016</time>
+        	
+         | <a href="/articles/2016/6/16/go-ssh-client-1.html#duoshuo_thread">评论</a>
+        
+      </p>
+    
+  </header>
+  <div class="entry-content">
+	###🏂热身运动
+&gt;在开始之前，先来个热身运动。虽然标题党写着快速打造一个ssh客户端，但是和跑步一样，在运动前还是需要先热身一下，不然到时候身体(大脑)会吃不消。所以，在开始前，我们先来科普一下ssh的一些东西。
+
+
+先来说说ssh，这里的ssh是指由IETF的网络小组（Network Working Group）所制定的为建立在应用层和传输层基础上的安全协议。（对于了解这个协议的请忽略本段文字😱）点这里了解更多ssh介绍
+
+写过java web应用的同学应该还知道另一个ssh(struts&#43;spring&#43;hibernate),当然今天的主角并不是它。😅
+
+其实接触过后端开发的同学对于ssh应该都不陌生，可能每天你都在使用它，没错，当你要远程登录服务器的时候，大多数情况下都离不开它，俨然已经成为Linux系统的标准配置。所以，如果你使用的是Linux操作系统，那么默认情况下就已经自带ssh的客户端了，于是乎你直接可以在Linux的shell中执行: ssh user@host 就可以安全的登录到了远程主机host。对于ssh的更多命令或者玩法今天就不多介绍了，因为这不是今天的主要目标，今天的主要任务是实现一个和Linux操作系统中默认自带的ssh命令行客户端一样的使用go语言开发的ssh命令行客户端，当然由于时间篇幅有限，这次并不会实现原生ssh命令行客户端的全部功能，主要是能够实现远程登录到远程host，并能进行命令行操作。对于其他高级命令，如端口转发等将在后续完成。
+
+
+###🔪工欲善其事必先利其器
+
+既然说了要快速打造，那么必然需要借助一些现有的工具包了，这边为了完成这个客户端，笔者对原生的go语言的ssh包进行了一下封装做了一个小工具包gosshtool,可以从
+ </div>
+    <footer>
+      <a href="/articles/2016/6/16/go-ssh-client-1.html" rel="full-article">阅读更多 →</a>
+    </footer>
+  
+    </article>
+  
+ <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/articles/2016/2/16/docker-nfs.html">使用docker搭建nfs实现容器间共享文件</a></h1>
     
       <p class="meta">
@@ -797,80 +833,6 @@ private List
   
     </article>
   
- <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/articles/2014/4/4/spring-dependency-injection-2.html">spring新手攻略（9）-依赖注入(二)(Dependency Injection)</a></h1>
-    
-      <p class="meta">
-<time data-updated="true" pubdate="" datetime="2014-04-24T21:58:00+08:00">Apr 4, 2014</time>
-        	
-         | <a href="/articles/2014/4/4/spring-dependency-injection-2.html#duoshuo_thread">评论</a>
-        
-      </p>
-    
-  </header>
-  <div class="entry-content">
-	前言
-
-在上篇文章中我们初步介绍了依赖注入（Dependency Injection）。今天将来介绍下spring框架中的两种依赖注入。
-
-两种依赖注入（Dependency Injection）
-
-
-基于构造函数的依赖注入
-基于Setter方法的依赖注入
-
-
-
-如果是强制性依赖的话建议使用基于构造函数的依赖注入，请看下面的例子：
-
-
-package sirk_spring_tuto.demo;
-
-public class TV {
-private Screen screen;
-
-public TV(Screen screen){
-    this.screen = screen;
-}
-
-public void powerOn(){
-    this.screen.show();
-}
-}
-
-
-
-package sirk_spring_tuto.demo;
-
-public interface Screen {
-public void show();
-}
-
-
-package sirk_spring_tuto.demo;
-
-public class CRTScreen implements Screen{
-
-public void show() {
-    System.out.println(&#34;CRTScreen show beautiful girls&#34;);
-}
-
-}
-
-
-
-
-
- </div>
-    <footer>
-      <a href="/articles/2014/4/4/spring-dependency-injection-2.html" rel="full-article">阅读更多 →</a>
-    </footer>
-  
-    </article>
-  
  
   
 </div>
@@ -892,6 +854,8 @@ public void show() {
 	<li><a href="/category.html#cocos2d-x">cocos2d-x</a></li>
 
 	<li><a href="/category.html#docker">docker</a></li>
+
+	<li><a href="/category.html#golang">golang</a></li>
 
 	<li><a href="/category.html#hadoop">hadoop</a></li>
 
@@ -920,6 +884,10 @@ public void show() {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/articles/2016/6/16/go-ssh-client-1.html">使用go的ssh包快速打造一个本地命令行ssh客户端</a>
+      </li>
+    
+      <li class="post">
         <a href="/articles/2016/2/16/docker-nfs.html">使用docker搭建nfs实现容器间共享文件</a>
       </li>
     
@@ -937,10 +905,6 @@ public void show() {
     
       <li class="post">
         <a href="/articles/2014/7/21/cocos2d-x-3-android-backspace-key.html">cocos2d-x 3.0学习-响应android的back按键</a>
-      </li>
-    
-      <li class="post">
-        <a href="/articles/2014/6/22/cocos2d-x-3-menu.html">cocos2d-x 3.0学习-创建菜单场景</a>
       </li>
     
   </ul>
