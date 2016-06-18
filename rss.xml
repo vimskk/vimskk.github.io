@@ -4,7 +4,7 @@
         <title>RSS 订阅酷酷时空</title>
         <link>cocosk.com</link>
         <description>RSS 酷酷时空</description>
-        <lastBuildDate>Sat, 18 Jun 2016 23:35:05 CST</lastBuildDate>
+        <lastBuildDate>Sat, 18 Jun 2016 23:40:19 CST</lastBuildDate>
         <language>zh-cn</language>
        
         <item>
@@ -12,10 +12,11 @@
             <link>2016/6/18/go-ssh-client-1.html</link>
             <author>卧雪Sirk</author>
             <pubDate>2016-06-18 11:52:00</pubDate>
-            <description>&lt;p&gt;###🏂热身运动
-&gt;在开始之前，先来个热身运动。虽然标题党写着快速打造一个ssh客户端，但是和跑步一样，在运动前还是需要先热身一下，不然到时候身体(大脑)会吃不消。所以，在开始前，我们先来科普一下ssh的一些东西。&lt;/p&gt;
+            <description>&lt;h2&gt;🏂热身运动&lt;/h2&gt;
 
 &lt;blockquote&gt;
+&lt;p&gt;在开始之前，先来个热身运动。虽然标题党写着快速打造一个ssh客户端，但是和跑步一样，在运动前还是需要先热身一下，不然到时候身体(大脑)会吃不消。所以，在开始前，我们先来科普一下ssh的一些东西。&lt;/p&gt;
+
 &lt;p&gt;先来说说ssh，这里的ssh是指由IETF的网络小组（Network Working Group）所制定的为建立在应用层和传输层基础上的安全协议。（对于了解这个协议的请忽略本段文字😱）&lt;a href=&#34;http://baike.baidu.com/link?url=FaRrDm1hC0Xc-R-yqycKE83g2y7HziNpMuYehYI2E2HoYadXU4x_yD2jdMmTOafhhxhETKHNYthn2vKpAsGWFIqAURBvx2l2Zza_cV8FECW&#34;&gt;点这里了解更多ssh介绍&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;写过java web应用的同学应该还知道另一个ssh(struts&#43;spring&#43;hibernate),当然今天的主角并不是它。😅&lt;/p&gt;
@@ -23,12 +24,13 @@
 &lt;p&gt;其实接触过后端开发的同学对于ssh应该都不陌生，可能每天你都在使用它，没错，当你要远程登录服务器的时候，大多数情况下都离不开它，俨然已经成为Linux系统的标准配置。所以，如果你使用的是Linux操作系统，那么默认情况下就已经自带ssh的客户端了，于是乎你直接可以在Linux的shell中执行: &lt;code&gt;ssh user@host&lt;/code&gt; 就可以安全的登录到了远程主机host。对于ssh的更多命令或者玩法今天就不多介绍了，因为这不是今天的主要目标，今天的主要任务是实现一个和Linux操作系统中默认自带的ssh命令行客户端一样的使用go语言开发的ssh命令行客户端，当然由于时间篇幅有限，这次并不会实现原生ssh命令行客户端的全部功能，主要是能够实现远程登录到远程host，并能进行命令行操作。对于其他高级命令，如端口转发等将在后续完成。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;###🔪工欲善其事必先利其器&lt;/p&gt;
+&lt;h2&gt;🔪工欲善其事必先利其器&lt;/h2&gt;
 
 &lt;p&gt;既然说了要快速打造，那么必然需要借助一些现有的工具包了，这边为了完成这个客户端，笔者对原生的go语言的ssh包进行了一下封装做了一个小工具包gosshtool,可以从&lt;a href=&#34;http://git.oschina.net/scottkiss/gosshtool&#34;&gt;码云&lt;/a&gt;或者&lt;a href=&#34;https://github.com/scottkiss/gosshtool&#34;&gt;github&lt;/a&gt;找到。有了它，再来做ssh的客户端就轻松多了。&lt;/p&gt;
 
-&lt;p&gt;###💻开始设计
-首先，要完成一个命令行的ssh客户端，我们先来看下Linux下自带的ssh客户端是怎么工作的。这里所说的怎么工作，会站在比较高层的角度，因为ssh的整个通讯协议比较复杂，这里不过多介绍，原因是go提供的ssh包已经把底层的一些协议实现了，这里没必要自己再写一套实现出来，如果你确实对底层协议有兴趣，可以自己去网上查阅文档。那么站在比较高层角度来看，是如何的呢？
+&lt;h2&gt;💻开始设计&lt;/h2&gt;
+
+&lt;p&gt;首先，要完成一个命令行的ssh客户端，我们先来看下Linux下自带的ssh客户端是怎么工作的。这里所说的怎么工作，会站在比较高层的角度，因为ssh的整个通讯协议比较复杂，这里不过多介绍，原因是go提供的ssh包已经把底层的一些协议实现了，这里没必要自己再写一套实现出来，如果你确实对底层协议有兴趣，可以自己去网上查阅文档。那么站在比较高层角度来看，是如何的呢？
 &gt;我们还原一个最常见的场景：某一天，你想登录远程主机，于是你打开了Linux的shell，
 输入&lt;/p&gt;
 
@@ -46,27 +48,23 @@
 &lt;a href=&#34;/images/go-ssh-client/aaa.png&#34;&gt;&lt;img src=&#34;/images/go-ssh-client/aaa.png&#34; alt=&#34;&#34; /&gt;
 &lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;根据上图，我们开始设计，首先要想办法读取用户的键盘输入，如：输入&lt;/p&gt;
+&lt;p&gt;根据上图，我们开始设计，首先要想办法读取用户的键盘输入，如：输入&lt;code&gt;pwd&lt;/code&gt;
+在go语言中，我们可以使用os和bufio两个包，关键代码如下：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;pwd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;在go语言中，我们可以使用os和bufio两个包，关键代码如下：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;go&#34;&gt;inputReader := bufio.NewReader(os.Stdin)
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;inputReader := bufio.NewReader(os.Stdin)
 input, err := inputReader.ReadString(&#39;\n&#39;)
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;
 
 &lt;p&gt;如上代码，我们就可以读取以换行结束的字符串。&lt;/p&gt;
 
 &lt;p&gt;这样完成了图中的第一步，第二步，我们将要建立与远程主机的ssh连接，这时候可以用到前面介绍的工具gosshtool了，有了它完成这一步变得轻松许多。在介绍这一步之前，我们先来对这个将要实现的客户端再多啰嗦几句，为了使我们的客户端看起来更像Linux自带的ssh客户端，我们假设将要做的这个客户端名字叫sshcmd，我们将要完成的任务是到时候生成一个叫sshcmd的可执行文件，然后执行&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;bash&#34;&gt;./sshcmd user@host 
-&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;./sshcmd user@host 
+&lt;/pre&gt;
 
 &lt;p&gt;就建立了远程ssh连接，并返回远程主机登录信息，接着你可以继续在控制台输入后续命令，这些命令实际上是在远程主机执行的，就像Linux自带的ssh客户端一样。所以，我们还要用到go的一个叫做flag的包，这个包在写命令行程序的时候非常有用，它可以方便的对命令参数进行解析。所以我们会写到如下关键代码：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;go&#34;&gt;func main() {
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;func main() {
   flag.StringVar(&amp;host, &#34;h&#34;, &#34;&#34;, &#34;host&#34;)
   flag.StringVar(&amp;passwd, &#34;p&#34;, &#34;&#34;, &#34;password&#34;)
   flag.Parse()
@@ -74,11 +72,11 @@ input, err := inputReader.ReadString(&#39;\n&#39;)
   user = hostsp[0]
   host = hostsp[1]
 }
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;
 
 &lt;p&gt;我们从命令行读取了user,host,password三个重要参数。有了它们，可以就可以建立ssh连接了关键代码如下：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;go&#34;&gt; config := &amp;gosshtool.SSHClientConfig{
+&lt;pre class=&#34;prettyprint linenums&#34;&gt; config := &amp;gosshtool.SSHClientConfig{
     User:     user,
     Password: passwd,
     Host:     host,
@@ -106,12 +104,11 @@ input, err := inputReader.ReadString(&#39;\n&#39;)
     fmt.Println(err)
   }
   defer session.Close()
-
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;
 
 &lt;p&gt;我们使用了gosshtool的NewSSHClient方法创建了一个客户端，并调用Connect()建立了连接，最后使用了Pipe(conn, pty, nil, 30)方法创建了一个保持会话，这样就号好了。这一切看起来如此简单，都要归功于Pipe这个方法，它的第一个参数是一个ReadWriteCloser接口类型，只要实现了该接口的结构都可以传入，这里我们会使用TCPConn这个结构，该结构实现了net.Conn接口，而net.Conn接口也是实现了ReadWriteCloser接口的。这个参数非常重要，我们建立了连接后，后续的通信全靠它了。你如果熟悉ReadWriteCloser接口，其实你就知道这个接口又组合了三个接口：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;go&#34;&gt;type ReadWriteCloser interface {
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;type ReadWriteCloser interface {
     Reader
     Writer
     Closer
@@ -128,12 +125,11 @@ type Reader interface {
 type Closer interface {
     Close() error
 }
-
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;
 
 &lt;p&gt;再看net.Conn接口：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;go&#34;&gt;type Conn interface {
+&lt;pre class=&#34;prettyprint linenums&#34;&gt;type Conn interface {
     // Read从连接中读取数据
     // Read方法可能会在超过某个固定时间限制后超时返回错误，该错误的Timeout()方法返回真
     Read(b []byte) (n int, err error)
@@ -158,7 +154,7 @@ type Closer interface {
     // 即使写入超时，返回值n也可能&gt;0，说明成功写入了部分数据
     SetWriteDeadline(t time.Time) error
 }
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;
 
 &lt;p&gt;对比下会发现Conn接口也实现了&lt;/p&gt;
 
@@ -176,10 +172,11 @@ type Closer interface {
 &lt;p&gt;正如图中所示，实际上Pipe方法可以理解为将tcp连接转成了ssh连接并可以通过它传递数据。当然也可以将websocket的连接转成ssh连接，这样就可以实现基于web网页的ssh客户端了，也是非常简单的，这个后续介绍。介绍到这里，大部分关键的点都已经说完了，这里只是简单实现了一个最简单版本的ssh命令行客户端，当然通过gosshtool还可以做很多好玩的东西，比如部署工具，本地转发服务，命令行运维工具等。最后，最最关键的，放上本次实践的完整源码：
 &lt;a href=&#34;https://github.com/scottkiss/sshcmd&#34;&gt;sshcmd源码&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;###总结
-本文介绍了如何打造一个本地命令行ssh客户端，如果基于现成的工具包确实没多少工作量，而且大部分功能都实现比较粗糙，权当抛砖引玉。&lt;/p&gt;
+&lt;h2&gt;总结&lt;/h2&gt;
 
-&lt;p&gt;##文档信息&lt;/p&gt;
+&lt;p&gt;本文介绍了如何打造一个本地命令行ssh客户端，如果基于现成的工具包确实没多少工作量，而且大部分功能都实现比较粗糙，权当抛砖引玉。&lt;/p&gt;
+
+&lt;h2&gt;文档信息&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;版权声明：自由转载-非商用-非衍生-保持署名 | &lt;a href=&#34;http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh&#34;&gt;Creative Commons BY-NC-ND 3.0&lt;/a&gt;&lt;/li&gt;
